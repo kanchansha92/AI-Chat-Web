@@ -1,0 +1,723 @@
+@import "tailwindcss";
+
+@theme {
+  /* Every --font-* token is aliased to the same Segoe UI stack, so the existing
+     font-serif / font-display / font-mono utilities keep working untouched.
+     Written out literally: Tailwind v4 only emits theme vars it sees used. */
+  --font-sans: "Segoe UI", "Segoe UI Variable Text", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "Segoe UI", "Segoe UI Variable Text", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-serif-eb: "Segoe UI", "Segoe UI Variable Text", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-serif-lora: "Segoe UI", "Segoe UI Variable Text", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-serif-playfair: "Segoe UI", "Segoe UI Variable Text", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-sans-jk: "Segoe UI", "Segoe UI Variable Text", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-caveat: "Segoe UI", "Segoe UI Variable Text", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-allura: "Segoe UI", "Segoe UI Variable Text", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-instrument: "Segoe UI", "Segoe UI Variable Text", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  /* Light theme. --color-rust holds a neutral grey now; the name stays so
+     the existing text-rust / bg-rust utilities don't all need editing.
+     The cream family reads cool now - a lavender-tinted white - so panels
+     and chips sit naturally on the .app-gradient page wash. Only the values
+     moved; every bg-cream / bg-cream-dark utility keeps working. */
+  --color-cream: #F4F5FD;
+  --color-cream-dark: #E8E9F7;
+  --color-cream-light: #FFFFFF;
+  --color-rust: #616B78;
+  --color-rust-hover: #4B535E;
+  --color-charcoal: #16202B;
+  --color-charcoal-light: #3A4A5A;
+
+  /* Use danger, never rust, on anything that deletes. */
+  --color-danger: #C0392B;
+  --color-danger-hover: #9C2C20;
+  --color-danger-light: #E0705F;
+
+  --color-cream-soft: var(--color-cream-light);
+  --color-ink: var(--color-charcoal);
+  --color-ink-soft: var(--color-charcoal-light);
+  --color-rust-light: #8E98A4;
+  --color-muted: #5A6B7C;
+  --color-hairline: #E1E3F2;
+
+  --font-display: "Segoe UI", "Segoe UI Variable Text", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-serif: "Segoe UI", "Segoe UI Variable Text", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+:root {
+  /* Page wash: a soft lavender at the top that resolves to white. Stops were
+     sampled off the reference, so the curve matches it rather than being a
+     straight two-stop fade. The lamplight block below re-points all five to
+     the warm dark palette, which is why .app-gradient itself never names a
+     colour. */
+  --app-grad-1: hsl(0, 0%, 98%);
+  --app-grad-2: #E7E9FF;
+  --app-grad-3: #e9e9f1;
+  --app-grad-4: #f5f5f7;
+  --app-grad-base: #FFFFFF;
+
+  background-color: var(--app-grad-base);
+  color: var(--color-charcoal);
+  --font-app: "Segoe UI", "Segoe UI Variable Text", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-app);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Unlayered so it also beats Tailwind's utilities - stops code/pre/kbd and
+   form controls falling back to the preflight's monospace stack. */
+*,
+*::before,
+*::after {
+  font-family: var(--font-app);
+}
+
+html {
+  background-color: var(--app-grad-base);
+}
+
+body {
+  background-color: var(--app-grad-base);
+
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+/* Dark theme. App.tsx sets data-theme="lamplight" on <html>; only the colour
+   tokens are re-pointed, so every bg-cream / text-ink utility flips with it. */
+html[data-theme="lamplight"] {
+  --color-cream: #221811;
+  --color-cream-dark: #2e2118;
+  --color-cream-light: #33261c;
+  --color-cream-soft: #201710;
+
+  --color-rust: #B9C0C9;
+  --color-rust-hover: #A3ABB5;
+  --color-rust-light: #D6DBE1;
+
+  --color-charcoal: #E6E9EC;
+  --color-charcoal-light: #ADB6BF;
+
+  /* lifted + desaturated so red still carries on the dark surfaces */
+  --color-danger: #F0776A;
+  --color-danger-hover: #FF9086;
+  --color-danger-light: #FFA79E;
+
+  --color-muted: #8D97A1;
+  --color-hairline: #46372a;
+
+  /* Same top-glow shape as light, built from this theme's own browns so the
+     lavender never bleeds into the dark palette. */
+  --app-grad-1: #2E2118;
+  --app-grad-2: #291D15;
+  --app-grad-3: #251A13;
+  --app-grad-4: #231911;
+  --app-grad-base: #221811;
+
+  background-color: var(--app-grad-base);
+  color: var(--color-charcoal);
+  color-scheme: dark;
+}
+
+/* The app-wide page background. Goes on a page's outermost element in place
+   of bg-cream. The gradient band is pinned to one viewport height and does
+   not repeat, so a long page fades to the base colour inside the first screen
+   and stays there however far it scrolls - the fade never stretches with the
+   content. Unlayered on purpose: it has to beat Tailwind's bg-* utilities. */
+.app-gradient {
+  background-color: var(--app-grad-base);
+  background-image:
+    linear-gradient(180deg,
+      var(--app-grad-1) 0%,
+      var(--app-grad-2) 26%,
+      var(--app-grad-3) 52%,
+      var(--app-grad-4) 70%,
+      var(--app-grad-base) 80%),
+    var(--paper-grain);
+  background-repeat: no-repeat, repeat;
+  background-position: top center, 0 0;
+  background-size: 100% 100vh, 160px 160px;
+}
+
+/* dvh tracks the collapsing mobile URL bar; vh above is the fallback. */
+@supports (height: 100dvh) {
+  .app-gradient {
+    background-size: 100% 100dvh, 160px 160px;
+  }
+}
+
+
+/* A faint paper grain laid under the page wash and on .paper sheets. Neutral
+   grey so it tints nothing; felt more than seen. Set to `none` to remove. */
+:root {
+  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.2 0 0 0 0 0.2 0 0 0 0 0.25 0 0 0 0.045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+html[data-theme="lamplight"] {
+  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 0.95 0 0 0 0 0.9 0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── Paper surfaces ────────────────────────────────────────────────────── */
+
+/* A sheet of paper sitting on the desk: for cards, sidebars, dialogs. */
+.paper {
+  background-color: var(--color-cream-light);
+  background-image: var(--paper-grain);
+  background-size: 160px 160px;
+  border: 1px solid var(--color-hairline);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--color-cream-soft) 60%, transparent) inset,
+    0 10px 30px -22px color-mix(in srgb, var(--color-charcoal) 55%, transparent);
+}
+
+/* The ruled lines of a notebook page — for the journal and empty states. */
+.ruled {
+  background-image: repeating-linear-gradient(to bottom,
+      transparent 0,
+      transparent calc(2rem - 1px),
+      color-mix(in srgb, var(--color-hairline) 70%, transparent) calc(2rem - 1px),
+      color-mix(in srgb, var(--color-hairline) 70%, transparent) 2rem);
+  background-size: 100% 2rem;
+}
+
+.dashed-divider {
+  border: 0;
+  border-top: 1px dashed var(--color-hairline);
+  width: 100%;
+  margin: 1.5rem 0;
+}
+
+/* A hand-drawn underline: an irregular stroke under a word in a headline. */
+.hand-underline {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 8' preserveAspectRatio='none'%3E%3Cpath d='M2 5.5c20-3 40-4 58-3 20 1 38 3 58 1' fill='none' stroke='%23616B78' stroke-width='2.2' stroke-linecap='round' opacity='.75'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 0.32em;
+  padding-bottom: 0.12em;
+}
+
+html[data-theme="lamplight"] .hand-underline {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 8' preserveAspectRatio='none'%3E%3Cpath d='M2 5.5c20-3 40-4 58-3 20 1 38 3 58 1' fill='none' stroke='%23B9C0C9' stroke-width='2.2' stroke-linecap='round' opacity='.8'/%3E%3C/svg%3E");
+}
+
+/* Kept for the two legacy buttons that still use them; toned down so they
+   sit with the rest of the paper UI rather than shouting. */
+.btn-neobrutal-rust,
+.btn-neobrutal-cream {
+  border: 1px solid var(--color-charcoal);
+  border-radius: 12px;
+  font-family: var(--font-serif-eb);
+  font-weight: 400;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 2px 2px 0 0 var(--color-charcoal);
+}
+
+.btn-neobrutal-rust {
+  background-color: var(--color-rust);
+  color: var(--color-cream-soft);
+}
+
+.btn-neobrutal-cream {
+  background-color: var(--color-cream-light);
+  color: var(--color-charcoal);
+}
+
+.btn-neobrutal-rust:hover,
+.btn-neobrutal-cream:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 0 var(--color-charcoal);
+}
+
+.btn-neobrutal-rust:active,
+.btn-neobrutal-cream:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 0 var(--color-charcoal);
+}
+
+/* ── Scrollbars ────────────────────────────────────────────────────────── */
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Sidebar nav column: thumb is transparent until you hover the column. */
+.quiet-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 200ms ease;
+  overscroll-behavior: contain;
+}
+
+.quiet-scrollbar:hover,
+.quiet-scrollbar:focus-within {
+  scrollbar-color: var(--color-hairline) transparent;
+}
+
+.quiet-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.quiet-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.quiet-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 9999px;
+  transition: background-color 200ms ease;
+}
+
+.quiet-scrollbar:hover::-webkit-scrollbar-thumb,
+.quiet-scrollbar:focus-within::-webkit-scrollbar-thumb {
+  background-color: var(--color-hairline);
+}
+
+.quiet-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-muted);
+}
+
+/* Always visible, not hover-only. Hex, because Chromium's ::-webkit-scrollbar
+   pseudo-elements don't resolve custom properties. Warm beige / brown. */
+.stream-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #616B78 transparent;
+}
+
+.stream-scrollbar::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+.stream-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.stream-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #616B78;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.stream-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #4B535E;
+  background-clip: padding-box;
+}
+
+html[data-theme="lamplight"] .stream-scrollbar {
+  scrollbar-color: #B9C0C9 transparent;
+}
+
+html[data-theme="lamplight"] .stream-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #B9C0C9;
+  background-clip: padding-box;
+}
+
+html[data-theme="lamplight"] .stream-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #A3ABB5;
+  background-clip: padding-box;
+}
+
+.dotted-rule {
+  background-image: linear-gradient(to right, var(--color-hairline) 65%, transparent 0%);
+  background-position: bottom;
+  background-size: 5px 1.5px;
+  background-repeat: repeat-x;
+  height: 1.5px;
+}
+
+/* ── Motion ────────────────────────────────────────────────────────────────
+   Everything eases in like a page settling, nothing bounces. */
+
+@keyframes chat-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.chat-rise {
+  animation: chat-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes chat-pop {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.chat-pop {
+  animation: chat-pop 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes chat-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.chat-fade {
+  animation: chat-fade 0.32s ease both;
+}
+
+@keyframes chat-sheet-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.chat-sheet-up {
+  animation: chat-sheet-up 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes chat-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.chat-dialog-in {
+  animation: chat-dialog-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes chat-toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.chat-toast-in {
+  animation: chat-toast-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes chat-shimmer {
+  0% {
+    background-position: -150% 0;
+  }
+
+  100% {
+    background-position: 250% 0;
+  }
+}
+
+.chat-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(100deg,
+      transparent 18%,
+      color-mix(in srgb, var(--color-cream-soft) 55%, transparent) 46%,
+      transparent 74%);
+  background-size: 220% 100%;
+  animation: chat-shimmer 2.4s linear infinite;
+  pointer-events: none;
+}
+
+/* A slow breath behind the status dot — a candle, not a notification. */
+@keyframes chat-halo {
+
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.1;
+    transform: scale(1.12);
+  }
+}
+
+.chat-halo::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 9999px;
+  background: currentColor;
+  opacity: 0.3;
+  animation: chat-halo 3.6s ease-in-out infinite;
+  z-index: -1;
+}
+
+@keyframes chat-dot {
+
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+
+  30% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+
+.chat-dot {
+  animation: chat-dot 1.3s ease-in-out infinite;
+}
+
+/* caret at the end of a streaming reply */
+@keyframes chat-caret {
+
+  0%,
+  45% {
+    opacity: 1;
+  }
+
+  50%,
+  95% {
+    opacity: 0.15;
+  }
+}
+
+.chat-caret {
+  animation: chat-caret 1.1s steps(1, end) infinite;
+}
+
+/* ── Chat surfaces ─────────────────────────────────────────────────────────
+   Paper, not glass. Near-opaque surfaces with a hairline, no blur, no gloss. */
+
+.chat-glass {
+  background: color-mix(in srgb, var(--color-cream-light) 96%, transparent);
+}
+
+.chat-sheet {
+  background: var(--color-cream-light);
+  background-image: var(--paper-grain);
+  background-size: 160px 160px;
+}
+
+.chat-scrim {
+  background: color-mix(in srgb, var(--color-charcoal) 40%, transparent);
+}
+
+/* Your lines: the accent, flat. Flat, one colour. */
+.chat-bubble-you {
+  background-color: var(--color-rust);
+  color: var(--color-cream-soft);
+  box-shadow: 0 6px 18px -14px color-mix(in srgb, var(--color-rust) 80%, transparent);
+}
+
+/* Their lines: a slip of lighter paper. */
+.chat-bubble-them {
+  background-color: var(--color-cream-light);
+  border: 1px solid color-mix(in srgb, var(--color-hairline) 90%, transparent);
+  box-shadow: 0 6px 16px -14px color-mix(in srgb, var(--color-charcoal) 50%, transparent);
+}
+
+.chat-composer {
+  background: var(--color-cream-light);
+  border: 1px solid var(--color-hairline);
+  box-shadow: 0 10px 28px -22px color-mix(in srgb, var(--color-charcoal) 60%, transparent);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.chat-composer:focus-within {
+  border-color: color-mix(in srgb, var(--color-rust) 55%, transparent);
+  box-shadow:
+    0 12px 30px -22px color-mix(in srgb, var(--color-charcoal) 60%, transparent),
+    0 0 0 3px color-mix(in srgb, var(--color-rust) 10%, transparent);
+}
+
+.chat-composer--imagine {
+  border-color: color-mix(in srgb, var(--color-rust) 60%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-rust) 12%, transparent);
+}
+
+.chat-accent {
+  background-color: var(--color-rust);
+  color: var(--color-cream-soft);
+  box-shadow: 0 6px 16px -10px color-mix(in srgb, var(--color-rust) 80%, transparent);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.chat-accent:hover {
+  background-color: var(--color-rust-hover);
+  box-shadow: 0 8px 20px -10px color-mix(in srgb, var(--color-rust) 85%, transparent);
+}
+
+/* rail buttons, jump-to-latest, menu rows */
+.chat-tile {
+  background: color-mix(in srgb, var(--color-cream-light) 75%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-hairline) 85%, transparent);
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.chat-tile:hover {
+  background: var(--color-cream-light);
+  border-color: color-mix(in srgb, var(--color-rust) 40%, transparent);
+}
+
+/* Soft colour pools behind a page. Much lower-key than before: a lamp on a
+   desk rather than an aurora. */
+.chat-ambient {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+/* hairline that fades out at both ends */
+.chat-rule {
+  height: 1px;
+  background: linear-gradient(to right,
+      transparent,
+      var(--color-hairline) 18%,
+      var(--color-hairline) 82%,
+      transparent);
+}
+
+/* The light-theme green is too dark to be legible on the dark surfaces. */
+.chat-status-here {
+  color: #68775B;
+}
+
+html[data-theme="lamplight"] .chat-status-here {
+  color: #9CB08D;
+}
+
+html[data-theme="lamplight"] .chat-bubble-you {
+  box-shadow: none;
+}
+
+/* ── Composer focus ────────────────────────────────────────────────────────
+   The "write to Ember" bar on the desk (GeneralChatBar) and the room composer.
+   Earlier versions panned a violet aurora behind the field; now it is a quiet
+   accent warmth that appears on focus and holds still. The class names
+   are unchanged so the components don't need touching. */
+:root {
+  --glow-grey: #8E98A4;
+  --glow-violet: #7C5CD6;
+  --glow-violet-soft: #A78BFA;
+}
+
+html[data-theme="lamplight"] {
+  --glow-grey: #6E7681;
+  --glow-violet: #bcb5d1;
+  --glow-violet-soft: #cabaf6;
+}
+
+.composer-glow {
+  background-image: radial-gradient(60% 120% at 50% 50%,
+      color-mix(in srgb, var(--glow-violet) 22%, transparent) 0%,
+      color-mix(in srgb, var(--glow-grey) 30%, transparent) 60%,
+      transparent 100%);
+}
+
+.composer-shell {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.group:focus-within .composer-shell {
+  border-color: color-mix(in srgb, var(--glow-violet) 50%, transparent);
+  box-shadow:
+    0 10px 28px -16px color-mix(in srgb, var(--glow-violet) 40%, transparent),
+    0 0 0 3px color-mix(in srgb, var(--glow-violet) 10%, transparent);
+}
+
+/* The rim: a single hairline in the accent, no gradient. */
+.composer-ring {
+  padding: 1px;
+  background: color-mix(in srgb, var(--glow-grey) 70%, transparent);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  transition: background-color 0.3s ease;
+}
+
+.group:focus-within .composer-ring {
+  background: color-mix(in srgb, var(--glow-violet) 60%, transparent);
+}
+
+/* Caret + selection pick up the ink instead of the browser blue. */
+.composer-field,
+.composer-field:focus,
+.composer-field:focus-visible {
+  caret-color: var(--glow-violet);
+  /* the pill around it is the only frame; the field itself draws nothing */
+  outline: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.composer-field::selection,
+textarea::selection,
+input::selection {
+  background: color-mix(in srgb, var(--color-rust) 22%, transparent);
+}
+
+/* Neutral variant used by the group composer: same shape, quieter tone. */
+.composer-neutral {
+  --glow-grey: #C3C9D1;
+  --glow-violet: #77808C;
+  --glow-violet-soft: #A6AEB8;
+}
+
+html[data-theme="lamplight"] .composer-neutral {
+  --glow-grey: #6B7079;
+  --glow-violet: #B9C0C9;
+  --glow-violet-soft: #D6DBE1;
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .chat-rise,
+  .chat-pop,
+  .chat-fade,
+  .chat-sheet-up,
+  .chat-dialog-in,
+  .chat-toast-in,
+  .chat-dot,
+  .chat-caret,
+  .chat-shimmer::after,
+  .chat-halo::before {
+    animation: none !important;
+  }
+}
