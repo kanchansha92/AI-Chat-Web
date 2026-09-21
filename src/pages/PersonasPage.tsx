@@ -43,7 +43,7 @@ export default function PersonasPage() {
   }
 
   useEffect(() => {
-    refresh().catch(() => setError("— couldn't read your personas just now."));
+    refresh().catch(() => setError("couldn't read your personas just now."));
     dispatch(loadBilling());
   }, [dispatch]);
 
@@ -51,7 +51,7 @@ export default function PersonasPage() {
     const r = refusalFrom(e);
     if (r) setRefusal(r);
     else if (e instanceof ApiError) setError(e.message);
-    else setError("— that didn't work just now.");
+    else setError("that didn't work just now.");
   }
 
   async function create(ev: React.FormEvent) {
@@ -114,7 +114,7 @@ export default function PersonasPage() {
         <header className="mt-6 md:mt-8">
           <h1 className="font-display text-ink text-[1.8rem] leading-tight">who are you, here?</h1>
           <p className="font-serif text-muted text-[0.98rem] mt-1.5">
-            a persona is how your characters see you — a name, and a little about you. one is active at a time.
+            a persona is how your characters see you a name, and a little about you. one is active at a time.
           </p>
           {changes && !changes.unlimited && changes.limit !== null && changes.limit > 0 && (
             <p className="font-caveat text-muted/80 text-[0.85rem] mt-1">
@@ -137,7 +137,7 @@ export default function PersonasPage() {
               onChange={(e) => setDescription(e.target.value)}
               maxLength={600}
               rows={3}
-              placeholder="a line or two about you — as much or as little as you like."
+              placeholder="a line or two about you as much or as little as you like."
               className="w-full rounded-[0.9rem] border border-hairline/70 bg-cream px-4 py-2.5 font-serif text-[0.95rem] text-ink placeholder:text-muted/70 focus:outline-none focus:border-rust/50 resize-none"
             />
             <button
@@ -155,14 +155,13 @@ export default function PersonasPage() {
           {personas === null ? (
             <p className="font-caveat text-muted text-[0.95rem]">looking…</p>
           ) : personas.length === 0 ? (
-            <p className="font-serif text-muted text-[0.95rem]">none yet — the one above is a good start.</p>
+            <p className="font-serif text-muted text-[0.95rem]">none yet the one above is a good start.</p>
           ) : (
             personas.map((p) => (
               <div
                 key={p.id}
-                className={`rounded-[1.2rem] border p-4 md:p-5 ${
-                  p.isActive ? "border-rust/60 bg-gradient-to-b from-cream-light to-cream ring-1 ring-rust/10" : "border-hairline/60 bg-cream-light"
-                }`}
+                className={`rounded-[1.2rem] border p-4 md:p-5 ${p.isActive ? "border-rust/60 bg-gradient-to-b from-cream-light to-cream ring-1 ring-rust/10" : "border-hairline/60 bg-cream-light"
+                  }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">

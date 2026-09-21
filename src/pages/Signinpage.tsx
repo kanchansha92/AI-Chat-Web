@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useAppDispatch } from "../hook/hooks";
 import { authService, ApiError } from "../services/authService";
 import { setAuth } from "../redux/authSlice";
-import { signInWithGoogle, signInWithFacebook } from "../services/socialAuth";
+import { signInWithGoogle, signInWithFacebook, isSocialAuthCancelled } from "../services/socialAuth";
 import { validateEmail, validateLoginPassword } from "../lib/validate";
 import { useSlowRequest } from "../hooks/useSlowRequest";
 import { formCopy, networkCopy } from "../copy";
@@ -51,6 +51,28 @@ function FacebookIcon() {
                 <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.16 8.44 9.94v-7.03H7.9v-2.91h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.87h2.78l-.44 2.91h-2.34V22c4.78-.78 8.44-4.94 8.44-9.94z" />
             </svg>
         </span>
+    );
+}
+
+function FormAlert({ message, onDismiss }: { message: string; onDismiss: () => void }) {
+    return (
+        <div
+            role="alert"
+            className="flex items-start gap-2.5 rounded-xl border border-danger/25 bg-danger/[0.06] px-3 py-2.5 font-serif text-danger text-[0.8rem] sm:text-[0.86rem] leading-snug"
+        >
+            <svg viewBox="0 0 20 20" aria-hidden="true" className="h-4 w-4 mt-[1px] shrink-0 fill-current">
+                <path d="M10 1.75a8.25 8.25 0 1 0 0 16.5 8.25 8.25 0 0 0 0-16.5Zm0 4a.9.9 0 0 1 .9.9v3.9a.9.9 0 0 1-1.8 0V6.65a.9.9 0 0 1 .9-.9Zm0 8.6a1.05 1.05 0 1 1 0-2.1 1.05 1.05 0 0 1 0 2.1Z" />
+            </svg>
+            <p className="flex-1">{message}</p>
+            <button
+                type="button"
+                onClick={onDismiss}
+                aria-label="Dismiss"
+                className="shrink-0 -mr-1 -mt-0.5 h-6 w-6 rounded-full flex items-center justify-center text-danger/70 hover:text-danger hover:bg-danger/10 cursor-pointer transition"
+            >
+                ×
+            </button>
+        </div>
     );
 }
 
@@ -119,6 +141,8 @@ function SignInPage() {
             dispatch(setAuth({ token, user }));
             navigate("/onboarding");
         } catch (err: unknown) {
+            // Closing the popup is a choice, not an error - stay quiet.
+            if (isSocialAuthCancelled(err)) return;
             setError(err instanceof Error ? err.message : "that didn't go through.");
         } finally {
             setSocialLoading(null);
@@ -126,8 +150,8 @@ function SignInPage() {
     };
 
     return (
-        <div className="flex-1 h-[100dvh] w-full overflow-hidden app-gradient flex items-start justify-center px-4 pt-3 pb-3 sm:pt-6">
-            <main className="w-full max-w-[380px] sm:max-w-[480px] lg:max-w-[500px] h-full max-h-[820px] flex flex-col">
+        <div className="flex-1 min-h-[100dvh] w-full app-gradient flex items-start justify-center px-4 pt-3 pb-3 sm:pt-6">
+            <main className="w-full max-w-[380px] sm:max-w-[480px] lg:max-w-[500px] min-h-[calc(100dvh-1.5rem)] sm:min-h-[calc(100dvh-2.25rem)] flex flex-col">
                 <div className="relative flex items-center justify-center lg:items-start lg:justify-start pt-2 pb-1 shrink-0">
                     <button
                         type="button"
@@ -142,7 +166,7 @@ function SignInPage() {
                     </p>
                 </div>
 
-                <div className="flex-1 flex flex-col justify-start min-h-0">
+                <div className="flex-1 flex flex-col justify-start">
                     <h1 className="font-display text-ink text-[1.5rem] sm:text-[1.9rem] lg:text-[2.15rem] leading-[1.15] font-medium mt-4 sm:mt-5">
                         Pick up where you
                         <br />
@@ -153,8 +177,8 @@ function SignInPage() {
                     </p>
 
                     {error && (
-                        <div className="font-serif  text-rust text-[0.8rem] sm:text-[0.88rem] mb-3 bg-rust/5 border border-rust/20 px-3.5 py-2.5 rounded-2xl">
-                            {error}
+                        <div className="mb-3">
+                            <FormAlert message={error} onDismiss={() => setError("")} />
                         </div>
                     )}
 
@@ -243,7 +267,7 @@ function SignInPage() {
                     </div>
                 </div>
 
-                <p className="font-serif  text-ink-soft text-[0.75rem] sm:text-[0.85rem] text-center shrink-0 pb-2 sm:pb-4">
+                <p className="font-serif  text-ink-soft text-[0.75rem] sm:text-[0.85rem] text-center shrink-0 pt-6 pb-2 sm:pb-4">
                     no account yet?{" "}
                     <button
                         type="button"

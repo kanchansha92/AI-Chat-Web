@@ -53,6 +53,21 @@ function loadScript(src: string, id: string): Promise<void> {
   });
 }
 
+/**
+ * Thrown when the person closes the provider popup themselves. That's a choice,
+ * not a failure, so the pages swallow it instead of showing an error box.
+ */
+export class SocialAuthCancelled extends Error {
+  constructor(provider: "Google" | "Facebook") {
+    super(`${provider} sign-in was cancelled.`);
+    this.name = "SocialAuthCancelled";
+  }
+}
+
+export function isSocialAuthCancelled(err: unknown): boolean {
+  return err instanceof SocialAuthCancelled;
+}
+
 let googleTokenClient: any = null;
 
 /** Rejects if Google isn't configured or the user dismisses the popup. */
@@ -74,12 +89,21 @@ export async function signInWithGoogle(): Promise<string> {
       callback: (response: any) => {
         if (response && response.access_token) {
           resolve(response.access_token);
+        } else if (response?.error === "access_denied") {
+          reject(new SocialAuthCancelled("Google"));
         } else {
-          reject(new Error(response?.error_description || "Google sign-in was cancelled."));
+          reject(new Error("Google sign-in didn’t go through. Please try again."));
         }
       },
+      // Google's raw messages ("Popup window closed") aren't meant for people.
       error_callback: (err: any) => {
-        reject(new Error(err?.message || "Google sign-in was cancelled."));
+        if (err?.type === "popup_closed") {
+          reject(new SocialAuthCancelled("Google"));
+        } else if (err?.type === "popup_failed_to_open") {
+          reject(new Error("Your browser blocked the sign-in popup. Allow popups for this site and try again."));
+        } else {
+          reject(new Error("Google sign-in didn’t go through. Please try again."));
+        }
       },
     });
     googleTokenClient.requestAccessToken();
@@ -135,7 +159,7 @@ export async function signInWithFacebook(): Promise<string> {
         if (response && response.authResponse && response.authResponse.accessToken) {
           resolve(response.authResponse.accessToken);
         } else {
-          reject(new Error("Facebook sign-in was cancelled."));
+          reject(new SocialAuthCancelled("Facebook"));
         }
       },
       { scope: "public_profile,email" }

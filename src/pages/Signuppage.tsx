@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useAppDispatch } from "../hook/hooks";
 import { authService, ApiError } from "../services/authService";
 import { setAuth } from "../redux/authSlice";
-import { signInWithGoogle, signInWithFacebook } from "../services/socialAuth";
+import { signInWithGoogle, signInWithFacebook, isSocialAuthCancelled } from "../services/socialAuth";
 import {
     validateName,
     validateEmail,
@@ -61,6 +61,28 @@ function FacebookIcon() {
     );
 }
 
+function FormAlert({ message, onDismiss }: { message: string; onDismiss: () => void }) {
+    return (
+        <div
+            role="alert"
+            className="flex items-start gap-2.5 rounded-xl border border-danger/25 bg-danger/[0.06] px-3 py-2.5 font-serif text-danger text-[0.8rem] sm:text-[0.86rem] leading-snug"
+        >
+            <svg viewBox="0 0 20 20" aria-hidden="true" className="h-4 w-4 mt-[1px] shrink-0 fill-current">
+                <path d="M10 1.75a8.25 8.25 0 1 0 0 16.5 8.25 8.25 0 0 0 0-16.5Zm0 4a.9.9 0 0 1 .9.9v3.9a.9.9 0 0 1-1.8 0V6.65a.9.9 0 0 1 .9-.9Zm0 8.6a1.05 1.05 0 1 1 0-2.1 1.05 1.05 0 0 1 0 2.1Z" />
+            </svg>
+            <p className="flex-1">{message}</p>
+            <button
+                type="button"
+                onClick={onDismiss}
+                aria-label="Dismiss"
+                className="shrink-0 -mr-1 -mt-0.5 h-6 w-6 rounded-full flex items-center justify-center text-danger/70 hover:text-danger hover:bg-danger/10 cursor-pointer transition"
+            >
+                ×
+            </button>
+        </div>
+    );
+}
+
 function SignUpPage() {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
@@ -94,6 +116,8 @@ function SignUpPage() {
             dispatch(setAuth({ token, user }));
             navigate("/onboarding");
         } catch (err: unknown) {
+            // Closing the popup is a choice, not an error - stay quiet.
+            if (isSocialAuthCancelled(err)) return;
             setError(err instanceof Error ? err.message : "that didn't go through.");
         } finally {
             setSocialLoading(null);
@@ -140,10 +164,16 @@ function SignUpPage() {
         }
     };
 
+    const inputClass =
+        "w-full rounded-2xl bg-cream-dark text-ink font-serif text-[0.85rem] sm:text-[0.95rem] px-3.5 sm:px-4 py-2.5 outline-none border border-transparent focus:border-rust/40 transition-colors placeholder:text-ink-soft/60";
+
     return (
-        <div className="flex-1 h-[100dvh] w-full overflow-hidden app-gradient flex items-start lg:items-center justify-center px-4 pt-3 pb-3 sm:pt-6 lg:py-8">
-            <main className="w-full max-w-[380px] sm:max-w-[480px] lg:max-w-[500px] h-full lg:h-auto max-h-[820px] flex flex-col">
-                <div className="relative flex items-center justify-center lg:items-start lg:justify-start pt-2 pb-1 shrink-0">
+        // Scrolls instead of clipping: `my-auto` centres the card when it fits and
+        // collapses to 0 when it doesn't, so the header never gets cut off.
+        <div className="flex-1 h-[100dvh] w-full overflow-y-auto app-gradient flex justify-center px-4 py-3 sm:py-6">
+            <main className="w-full max-w-[380px] sm:max-w-[480px] lg:max-w-[500px] my-auto flex flex-col">
+                {/* 1 · header */}
+                <div className="relative flex items-center justify-center lg:justify-start pt-1 shrink-0">
                     <button
                         type="button"
                         onClick={() => navigate("/")}
@@ -152,177 +182,185 @@ function SignUpPage() {
                     >
                         <span className="font-display text-sm sm:text-base leading-none -translate-x-px">‹</span>
                     </button>
-                    <p className="font-serif  text-ink-soft text-[1rem] sm:text-[1.5rem] lg:text-[1.8rem] tracking-wide">
+                    <p className="font-serif  text-ink-soft text-[1rem] sm:text-[1.3rem] lg:text-[1.5rem] tracking-wide">
                         get started
                     </p>
                 </div>
 
-                <div className="flex-1 flex flex-col justify-start min-h-0">
-                    <h1 className="font-display text-ink text-[1.5rem] sm:text-[1.9rem] lg:text-[2.15rem] leading-[1.15] font-medium mt-4 sm:mt-5">
-                        A notebook of your <span className=" text-rust">own</span>.
-                    </h1>
-                    <p className="font-serif  text-ink-soft text-[0.8rem] sm:text-[0.95rem] lg:text-[1rem] mt-2 mb-1">
-                        adults only · 18+ · private by default.
-                    </p>
-                    {/* Before the form, not under the button. The policy says
-                      replies are written by sending the conversation to an AI
-                      company - worth knowing before the account exists. */}
-                    <p className="font-caveat text-muted text-[0.8rem] sm:text-[0.88rem] mb-4 sm:mb-5">
-                        by signing up you agree to how we handle your words &mdash;{" "}
-                        <Link to="/privacy" className="text-rust hover:text-rust-hover underline underline-offset-2">
-                            read the privacy policy
-                        </Link>
-                        .
-                    </p>
+                <h1 className="font-display text-ink text-[1.5rem] sm:text-[1.9rem] lg:text-[2.15rem] leading-[1.15] font-medium mt-3">
+                    A notebook of your <span className=" text-rust">own</span>.
+                </h1>
+                <p className="font-serif  text-ink-soft text-[0.8rem] sm:text-[0.95rem] lg:text-[1rem] mt-1.5">
+                    adults only · 18+ · private by default.
+                </p>
+                {/* Before any way of signing up (social included), not under the
+                  button. The policy says replies are written by sending the
+                  conversation to an AI company - worth knowing before the
+                  account exists. */}
+                <p className="font-caveat text-muted text-[0.8rem] sm:text-[0.88rem] mt-1 mb-4">
+                    by signing up you agree to how we handle your words &mdash;{" "}
+                    <Link to="/privacy" className="text-rust hover:text-rust-hover underline underline-offset-2">
+                        read the privacy policy
+                    </Link>
+                    .
+                </p>
 
-                    {error && (
-                        <div className="font-serif  text-rust text-[0.8rem] sm:text-[0.88rem] mb-3 bg-rust/5 border border-rust/20 px-3.5 py-2.5 rounded-2xl">
-                            {error}
-                        </div>
-                    )}
-
-                    <form className="flex flex-col gap-3 sm:gap-4 w-full" onSubmit={handleSubmit}>
-                        <div>
-                            <FieldLabel>your name</FieldLabel>
-                            <input
-                                type="text"
-                                placeholder="what should we call you?"
-                                value={name}
-                                onChange={(e) => {
-                                    setName(e.target.value);
-                                    clearField("name");
-                                }}
-                                aria-invalid={fieldErr.name ? true : undefined}
-                                className="w-full rounded-2xl bg-cream-dark text-ink font-serif text-[0.85rem] sm:text-[0.95rem] px-3.5 sm:px-4 py-2.5 sm:py-3 outline-none border border-transparent focus:border-rust/40 transition-colors placeholder:text-ink-soft/60 placeholder:"
-                            />
-                            <FieldError message={fieldErr.name} />
-                        </div>
-
-                        <div>
-                            <FieldLabel>email</FieldLabel>
-                            <input
-                                type="email"
-                                placeholder="you@example.com"
-                                value={email}
-                                onChange={(e) => {
-                                    setEmail(e.target.value);
-                                    clearField("email");
-                                }}
-                                aria-invalid={fieldErr.email ? true : undefined}
-                                className="w-full rounded-2xl bg-cream-dark text-ink font-serif text-[0.85rem] sm:text-[0.95rem] px-3.5 sm:px-4 py-2.5 sm:py-3 outline-none border border-transparent focus:border-rust/40 transition-colors placeholder:text-ink-soft/60 placeholder:"
-                            />
-                            <FieldError message={fieldErr.email} />
-                        </div>
-
-                        <div>
-                            <FieldLabel>password</FieldLabel>
-                            <input
-                                type="password"
-                                placeholder="at least 10 characters"
-                                value={password}
-                                onChange={(e) => {
-                                    setPassword(e.target.value);
-                                    clearField("password");
-                                }}
-                                aria-invalid={fieldErr.password ? true : undefined}
-                                className="w-full rounded-2xl bg-cream-dark text-ink font-serif text-[0.85rem] sm:text-[0.95rem] px-3.5 sm:px-4 py-2.5 sm:py-3 outline-none border border-transparent focus:border-rust/40 transition-colors placeholder:text-ink-soft/60 placeholder:"
-                            />
-                            <FieldError message={fieldErr.password} />
-                        </div>
-
-                        <div>
-                            <FieldLabel>date of birth · stays locked</FieldLabel>
-                            <div className="flex gap-2 sm:gap-3">
-                                <input
-                                    type="text"
-                                    inputMode="numeric"
-                                    placeholder="Day"
-                                    aria-label="Day"
-                                    maxLength={2}
-                                    value={day}
-                                    onChange={(e) => {
-                                        setDay(e.target.value.replace(/\D/g, ""));
-                                        clearField("dob");
-                                    }}
-                                    aria-invalid={fieldErr.dob ? true : undefined}
-                                    className="w-full rounded-2xl bg-cream-dark text-ink font-serif text-[0.85rem] sm:text-[0.95rem] px-3.5 sm:px-4 py-2.5 sm:py-3 text-center outline-none border border-transparent focus:border-rust/40 transition-colors placeholder:text-ink-soft/60"
-                                />
-                                <input
-                                    type="text"
-                                    inputMode="numeric"
-                                    placeholder="Month"
-                                    aria-label="Month"
-                                    maxLength={2}
-                                    value={month}
-                                    onChange={(e) => {
-                                        setMonth(e.target.value.replace(/\D/g, ""));
-                                        clearField("dob");
-                                    }}
-                                    aria-invalid={fieldErr.dob ? true : undefined}
-                                    className="w-full rounded-2xl bg-cream-dark text-ink font-serif text-[0.85rem] sm:text-[0.95rem] px-3.5 sm:px-4 py-2.5 sm:py-3 text-center outline-none border border-transparent focus:border-rust/40 transition-colors placeholder:text-ink-soft/60"
-                                />
-                                <input
-                                    type="text"
-                                    inputMode="numeric"
-                                    placeholder="Year"
-                                    aria-label="Year"
-                                    maxLength={4}
-                                    value={year}
-                                    onChange={(e) => {
-                                        setYear(e.target.value.replace(/\D/g, ""));
-                                        clearField("dob");
-                                    }}
-                                    aria-invalid={fieldErr.dob ? true : undefined}
-                                    className="w-full rounded-2xl bg-cream-dark text-ink font-serif text-[0.85rem] sm:text-[0.95rem] px-3.5 sm:px-4 py-2.5 sm:py-3 text-center outline-none border border-transparent focus:border-rust/40 transition-colors placeholder:text-ink-soft/60"
-                                />
-                            </div>
-                            <FieldError message={fieldErr.dob} />
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full rounded-full bg-rust text-cream-soft cursor-pointer font-display  text-[0.9rem] sm:text-[1.05rem] py-3 sm:py-3.5 mt-2 shadow-[0_6px_16px_-4px_rgba(97,107,120,0.55)] transition-all duration-150 hover:brightness-105 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
-                        >
-                            {loading ? "opening it…" : "Open my notebook →"}
-                        </button>
-
-                        {slow && loading && (
-                            <p className="text-center font-caveat  text-muted text-[0.82rem] -mt-1">
-                                {networkCopy.slow}
-                            </p>
-                        )}
-                    </form>
-
-                    <div className="flex items-center gap-3 my-4 sm:my-5">
-                        <div className="dotted-rule flex-1" aria-hidden="true" />
-                        <span className="font-serif  text-muted text-[0.75rem] sm:text-[0.85rem]">or</span>
-                        <div className="dotted-rule flex-1" aria-hidden="true" />
+                {error && (
+                    <div className="mb-3">
+                        <FormAlert message={error} onDismiss={() => setError("")} />
                     </div>
+                )}
 
-                    <div className="flex flex-col sm:flex-col md:flex-row gap-2.5 sm:gap-3">
-                        <button
-                            type="button"
-                            onClick={() => handleSocial("google")}
-                            disabled={socialLoading !== null || loading}
-                            className="w-full cursor-pointer rounded-full bg-cream-dark text-ink font-serif text-[0.85rem] sm:text-[0.95rem] py-2.5 sm:py-3 flex items-center justify-center gap-2.5 border border-transparent hover:border-rust/30 active:scale-[0.98] transition disabled:opacity-60 disabled:cursor-not-allowed"
-                        >
-                            <GoogleIcon />
-                            {socialLoading === "google" ? "connecting…" : "Continue with Google"}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => handleSocial("facebook")}
-                            disabled={socialLoading !== null || loading}
-                            className="w-full cursor-pointer rounded-full bg-cream-dark text-ink font-serif text-[0.85rem] sm:text-[0.95rem] py-2.5 sm:py-3 flex items-center justify-center gap-2.5 border border-transparent hover:border-rust/30 active:scale-[0.98] transition disabled:opacity-60 disabled:cursor-not-allowed"
-                        >
-                            <FacebookIcon />
-                            {socialLoading === "facebook" ? "connecting…" : "Continue with Facebook"}
-                        </button>
-                    </div>
+                {/* 2 · fastest path first */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+                    <button
+                        type="button"
+                        onClick={() => handleSocial("google")}
+                        disabled={socialLoading !== null || loading}
+                        className="w-full cursor-pointer rounded-full bg-cream-dark text-ink font-serif text-[0.85rem] sm:text-[0.95rem] py-2.5 flex items-center justify-center gap-2.5 border border-transparent hover:border-rust/30 active:scale-[0.98] transition disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                        <GoogleIcon />
+                        {socialLoading === "google" ? "connecting…" : "Continue with Google"}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => handleSocial("facebook")}
+                        disabled={socialLoading !== null || loading}
+                        className="w-full cursor-pointer rounded-full bg-cream-dark text-ink font-serif text-[0.85rem] sm:text-[0.95rem] py-2.5 flex items-center justify-center gap-2.5 border border-transparent hover:border-rust/30 active:scale-[0.98] transition disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                        <FacebookIcon />
+                        {socialLoading === "facebook" ? "connecting…" : "Continue with Facebook"}
+                    </button>
                 </div>
 
-                <p className="font-serif  text-ink-soft text-[0.75rem] sm:text-[0.85rem] text-center shrink-0 pb-2 sm:pb-4">
+                <div className="flex items-center gap-3 my-4">
+                    <div className="dotted-rule flex-1" aria-hidden="true" />
+                    <span className="font-serif  text-muted text-[0.75rem] sm:text-[0.85rem]">or use your email</span>
+                    <div className="dotted-rule flex-1" aria-hidden="true" />
+                </div>
+
+                {/* 3 · email form */}
+                <form className="flex flex-col gap-3 w-full" onSubmit={handleSubmit}>
+                    <div>
+                        <FieldLabel>your name</FieldLabel>
+                        <input
+                            type="text"
+                            autoComplete="name"
+                            placeholder="what should we call you?"
+                            value={name}
+                            onChange={(e) => {
+                                setName(e.target.value);
+                                clearField("name");
+                            }}
+                            aria-invalid={fieldErr.name ? true : undefined}
+                            className={inputClass}
+                        />
+                        <FieldError message={fieldErr.name} />
+                    </div>
+
+                    <div>
+                        <FieldLabel>email</FieldLabel>
+                        <input
+                            type="email"
+                            autoComplete="email"
+                            placeholder="you@example.com"
+                            value={email}
+                            onChange={(e) => {
+                                setEmail(e.target.value);
+                                clearField("email");
+                            }}
+                            aria-invalid={fieldErr.email ? true : undefined}
+                            className={inputClass}
+                        />
+                        <FieldError message={fieldErr.email} />
+                    </div>
+
+                    <div>
+                        <FieldLabel>password</FieldLabel>
+                        <input
+                            type="password"
+                            autoComplete="new-password"
+                            placeholder="at least 10 characters"
+                            value={password}
+                            onChange={(e) => {
+                                setPassword(e.target.value);
+                                clearField("password");
+                            }}
+                            aria-invalid={fieldErr.password ? true : undefined}
+                            className={inputClass}
+                        />
+                        <FieldError message={fieldErr.password} />
+                    </div>
+
+                    <div>
+                        <FieldLabel>date of birth · stays locked</FieldLabel>
+                        <div className="grid grid-cols-[1fr_1fr_1.4fr] gap-2 sm:gap-3">
+                            <input
+                                type="text"
+                                inputMode="numeric"
+                                autoComplete="bday-day"
+                                placeholder="DD"
+                                aria-label="Day"
+                                maxLength={2}
+                                value={day}
+                                onChange={(e) => {
+                                    setDay(e.target.value.replace(/\D/g, ""));
+                                    clearField("dob");
+                                }}
+                                aria-invalid={fieldErr.dob ? true : undefined}
+                                className={`${inputClass} text-center`}
+                            />
+                            <input
+                                type="text"
+                                inputMode="numeric"
+                                autoComplete="bday-month"
+                                placeholder="MM"
+                                aria-label="Month"
+                                maxLength={2}
+                                value={month}
+                                onChange={(e) => {
+                                    setMonth(e.target.value.replace(/\D/g, ""));
+                                    clearField("dob");
+                                }}
+                                aria-invalid={fieldErr.dob ? true : undefined}
+                                className={`${inputClass} text-center`}
+                            />
+                            <input
+                                type="text"
+                                inputMode="numeric"
+                                autoComplete="bday-year"
+                                placeholder="YYYY"
+                                aria-label="Year"
+                                maxLength={4}
+                                value={year}
+                                onChange={(e) => {
+                                    setYear(e.target.value.replace(/\D/g, ""));
+                                    clearField("dob");
+                                }}
+                                aria-invalid={fieldErr.dob ? true : undefined}
+                                className={`${inputClass} text-center`}
+                            />
+                        </div>
+                        <FieldError message={fieldErr.dob} />
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full rounded-full bg-rust text-cream-soft cursor-pointer font-display  text-[0.9rem] sm:text-[1.05rem] py-3 mt-1 shadow-[0_6px_16px_-4px_rgba(97,107,120,0.55)] transition-all duration-150 hover:brightness-105 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
+                    >
+                        {loading ? "opening it…" : "Open my notebook →"}
+                    </button>
+
+                    {slow && loading && (
+                        <p className="text-center font-caveat  text-muted text-[0.82rem] -mt-1">
+                            {networkCopy.slow}
+                        </p>
+                    )}
+                </form>
+
+                {/* 4 · footer */}
+                <p className="font-serif  text-ink-soft text-[0.75rem] sm:text-[0.85rem] text-center shrink-0 mt-4 pb-1">
                     already have one?{" "}
                     <button
                         type="button"

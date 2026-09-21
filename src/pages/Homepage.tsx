@@ -848,25 +848,25 @@ function HomePage() {
                     <div className={`${compact ? "ml-4" : "ml-4 lg:ml-5"} pl-3 border-l border-hairline/60 my-0.5 flex flex-col gap-0.5`}>
                         {pinnedSessions.length > 0 && (
                             <>
-                                <p className={groupLabel}>— notes to Privateaile</p>
+                                <p className={groupLabel}>notes to Privateaile</p>
                                 {pinnedSessions.map((s) => generalChatRow(s, "pinned"))}
                             </>
                         )}
                         {pinnedThreads.length > 0 && (
                             <>
-                                <p className={groupLabel}>— journal</p>
+                                <p className={groupLabel}>journal</p>
                                 {pinnedThreads.map((t) => journalThreadRow(t, "pinned"))}
                             </>
                         )}
                         {pinnedCharacters.length > 0 && (
                             <>
-                                <p className={groupLabel}>— characters</p>
+                                <p className={groupLabel}>characters</p>
                                 {pinnedCharacters.map((c) => characterRow(c, "pinned"))}
                             </>
                         )}
                         {pinnedGroups.length > 0 && (
                             <>
-                                <p className={groupLabel}>— rooms</p>
+                                <p className={groupLabel}>rooms</p>
                                 {pinnedGroups.map((g) => groupRow(g, "pinned"))}
                             </>
                         )}
@@ -907,7 +907,7 @@ function HomePage() {
                 <div className={`${compact ? "ml-4" : "ml-4 lg:ml-5"} pl-3 border-l border-hairline/60 my-0.5 flex flex-col gap-0.5`}>
                     {recentSessions.length === 0 ? (
                         <p className="font-caveat  text-muted text-xs px-2.5 py-1">
-                            {generalSessions.length === 0 ? "— nothing written yet" : "— all chats pinned"}
+                            {generalSessions.length === 0 ? "nothing written yet" : "all chats pinned"}
                         </p>
                     ) : (
                         recentSessions.map((s) => generalChatRow(s, "list"))
@@ -962,9 +962,9 @@ function HomePage() {
                                     <span>New character</span>
                                 </button>
                                 {loadingCharacters ? (
-                                    <p className="font-caveat  text-muted text-xs px-2.5 py-1">— loading…</p>
+                                    <p className="font-caveat  text-muted text-xs px-2.5 py-1">loading…</p>
                                 ) : characters.length === 0 ? (
-                                    <p className="font-caveat  text-muted text-xs px-2.5 py-1">— no characters yet</p>
+                                    <p className="font-caveat  text-muted text-xs px-2.5 py-1">no characters yet</p>
                                 ) : (
                                     orderedCharacters.map((c) => characterRow(c))
                                 )}
@@ -1001,9 +1001,9 @@ function HomePage() {
                                     <span>New room</span>
                                 </button>
                                 {groups === null ? (
-                                    <p className="font-caveat  text-muted text-xs px-2.5 py-1">— loading…</p>
+                                    <p className="font-caveat  text-muted text-xs px-2.5 py-1">loading…</p>
                                 ) : groups.length === 0 ? (
-                                    <p className="font-caveat  text-muted text-xs px-2.5 py-1">— no groups yet</p>
+                                    <p className="font-caveat  text-muted text-xs px-2.5 py-1">no groups yet</p>
                                 ) : (
                                     orderedGroups.map((g) => groupRow(g))
                                 )}
@@ -1056,7 +1056,7 @@ function HomePage() {
                             <PrivateaileMark className="h-9 w-9" />
                             <div>
                                 <h2 className="font-display text-ink text-[1.35rem] leading-none">privateaile</h2>
-                                <p className="font-serif  text-muted text-[0.65rem]">— a quiet place</p>
+                                <p className="font-serif  text-muted text-[0.65rem]">a quiet place</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
@@ -1132,9 +1132,9 @@ function HomePage() {
                                         <span>New thread</span>
                                     </button>
                                     {journalThreads === null ? (
-                                        <p className="font-caveat  text-muted text-xs px-2.5 py-1">— loading…</p>
+                                        <p className="font-caveat  text-muted text-xs px-2.5 py-1">loading…</p>
                                     ) : journalThreads.length === 0 ? (
-                                        <p className="font-caveat  text-muted text-xs px-2.5 py-1">— no threads yet</p>
+                                        <p className="font-caveat  text-muted text-xs px-2.5 py-1">no threads yet</p>
                                     ) : (
                                         orderedThreads.map((t) => journalThreadRow(t))
                                     )}
@@ -1245,7 +1245,7 @@ function HomePage() {
                                 <PrivateaileMark className="h-9 w-9 lg:h-10 lg:w-10" />
                                 <div className="min-w-0 flex-1">
                                     <h1 className="font-display text-ink text-[1.45rem] lg:text-[1.6rem] leading-none">privateaile</h1>
-                                    <p className="font-serif  text-muted text-xs truncate">— a quiet place</p>
+                                    <p className="font-serif  text-muted text-xs truncate">a quiet place</p>
                                 </div>
                                 <button
                                     type="button"
@@ -1321,9 +1321,9 @@ function HomePage() {
                                             <span>New thread</span>
                                         </button>
                                         {journalThreads === null ? (
-                                            <p className="font-caveat  text-muted text-xs px-3 py-1">— loading threads…</p>
+                                            <p className="font-caveat  text-muted text-xs px-3 py-1">loading threads…</p>
                                         ) : journalThreads.length === 0 ? (
-                                            <p className="font-caveat  text-muted text-xs px-3 py-1">— no threads yet</p>
+                                            <p className="font-caveat  text-muted text-xs px-3 py-1">no threads yet</p>
                                         ) : (
                                             orderedThreads.map((t) => journalThreadRow(t))
                                         )}
