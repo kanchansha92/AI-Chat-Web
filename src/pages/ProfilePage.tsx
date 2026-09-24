@@ -65,7 +65,7 @@ function CheckIcon() {
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-[1.3rem] bg-cream-light border border-hairline/60 p-5 md:p-8 shadow-[0_18px_44px_-32px_rgba(22,32,43,0.4)]">
+    <div className="rounded-[1.3rem] bg-cream-light border border-hairline/60 p-5 md:p-8 shadow-[0_18px_44px_-32px_rgba(22,34,74,0.4)]">
       {children}
     </div>
   );
@@ -139,7 +139,7 @@ function Action({
       disabled={disabled}
       className={`rounded-full font-serif  text-[0.98rem] px-6 py-2.5 transition active:scale-[0.98] ${disabled
         ? "bg-rust/35 text-cream-soft/80 cursor-default"
-        : "bg-rust text-cream-soft hover:bg-rust-hover cursor-pointer shadow-[0_6px_16px_-6px_rgba(97,107,120,0.55)]"
+        : "bg-rust text-cream-soft hover:bg-rust-hover cursor-pointer shadow-[0_6px_16px_-6px_rgba(37,49,94,0.55)]"
         }`}
     >
       {children}
@@ -538,10 +538,10 @@ export default function ProfilePage() {
         </div>
 
         <div
-          className="mt-6 rounded-[1.5rem] border border-hairline/60 px-6 py-8 flex flex-col items-center text-center shadow-[0_18px_44px_-32px_rgba(22,32,43,0.4)]"
+          className="mt-6 rounded-[1.5rem] border border-hairline/60 px-6 py-8 flex flex-col items-center text-center shadow-[0_18px_44px_-32px_rgba(22,34,74,0.4)]"
           style={{
             background:
-              "linear-gradient(160deg, rgba(104,119,91,0.16), rgba(97,107,120,0.10) 58%, rgba(250,248,245,0.7))",
+              "linear-gradient(160deg, rgba(104,119,91,0.16), rgba(37,49,94,0.10) 58%, rgba(250,248,245,0.7))",
           }}
         >
           <AvatarDisc src={user.avatar} initial={initial} className="h-24 w-24 text-[2.4rem]" />
@@ -587,10 +587,10 @@ export default function ProfilePage() {
         <div className="grid grid-cols-[300px_1fr] lg:grid-cols-[340px_1fr] gap-9 lg:gap-14 pt-8">
           <aside className="sticky top-8 self-start flex flex-col gap-5">
             <div
-              className="rounded-[1.5rem] border border-hairline/60 p-7 flex flex-col items-center text-center shadow-[0_22px_50px_-30px_rgba(22,32,43,0.45)]"
+              className="rounded-[1.5rem] border border-hairline/60 p-7 flex flex-col items-center text-center shadow-[0_22px_50px_-30px_rgba(22,34,74,0.45)]"
               style={{
                 background:
-                  "linear-gradient(160deg, rgba(104,119,91,0.18), rgba(97,107,120,0.10) 55%, rgba(250,248,245,0.7))",
+                  "linear-gradient(160deg, rgba(104,119,91,0.18), rgba(37,49,94,0.10) 55%, rgba(250,248,245,0.7))",
               }}
             >
               <AvatarDisc src={user.avatar} initial={initial} className="h-28 w-28 text-[2.8rem]" />

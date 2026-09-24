@@ -202,7 +202,7 @@ export const helpCopy = {
   quickActions: {
     label: "quick things",
     items: [
-      { key: "privacy", title: "Privacy policy", sub: "what we store, and what leaves our servers", to: "/privacy" },
+      { key: "privacy", title: "Privacy policy", sub: "what we store, and what leaves our servers", to: "/settings/legal#privacy" },
       { key: "billing", title: "Plan & billing", sub: "see your tier, change it, or check a charge", to: "/settings/billing" },
       { key: "export", title: "Export your data", sub: "a JSON of everything you've written", to: "/settings/export" },
       { key: "profile", title: "Your profile", sub: "name, birth date, the basics", to: "/settings/profile" },
@@ -253,7 +253,7 @@ export const helpCopy = {
     {
       topic: "data" as HelpTopic,
       q: "Where do my words actually go?",
-      a: "the privacy policy says it plainly - what we store, what leaves our servers, how long any of it lives, and who can read it. settings → privacy → privacy policy, or privateaile.app/privacy.",
+      a: "the privacy policy says it plainly - what we store, what leaves our servers, how long any of it lives, and who can read it. settings → privacy → privacy policy, or privateaile.app/legal.",
     },
     {
       topic: "account" as HelpTopic,
@@ -298,4 +298,41 @@ export const helpCopy = {
     },
   },
   footer: "privateaile · a quiet place to think, write, remember, and create.",
+} as const;
+
+/* Voice: dictation into the composer, and hearing a reply read back.
+   Every refusal the SERVER sends already carries its own sentence
+   (lib/errors.js), so these are only for what happens in the browser -
+   microphones, permissions, playback - plus the one thing the client can
+   answer without asking: a plan that has no voice at all. */
+export const voiceCopy = {
+  record: "Record a voice note",
+  recording: "recording",
+  stop: "Stop recording",
+  cancel: "Discard recording",
+  transcribing: "writing that down…",
+  speak: "Speak this reply",
+  speakShort: "Speak",
+  generating: "finding their voice…",
+  playing: "Playing",
+  pause: "Pause",
+  resume: "Resume",
+  premiumLabel: "premium voice",
+  premiumCost: (credits: number) => `${credits} credit${credits === 1 ? "" : "s"} each time`,
+  premiumOff: "the warmer voice isn't switched on here yet.",
+  // browser-side trouble, in plain words
+  unsupported: "this browser can't record. try chrome, edge or firefox?",
+  denied: "no microphone access. allow it in your browser, then try again.",
+  noMic: "couldn't find a microphone.",
+  micFailed: "couldn't start recording. try again?",
+  empty: "that recording was too short to hear.",
+  tooLong: (minutes: number) => `recordings stop at ${minutes} minutes.`,
+  tooBig: "that recording is too big. try a shorter one.",
+  nothingHeard: "nothing came through. try again?",
+  sttFailed: "couldn't turn that into words. try again?",
+  ttsFailed: "couldn't read that out. try again?",
+  playbackFailed: "couldn't play that. try again?",
+  unavailable: "voice is not switched on here yet.",
+  notOnPlan: "voice is part of the paid plans.",
+  usage: (left: string, replies: string) => `${left} of voice left · ${replies} spoken replies`,
 } as const;

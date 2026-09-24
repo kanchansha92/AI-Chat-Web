@@ -167,7 +167,7 @@ function OnboardingPage() {
                         type="button"
                         onClick={handleContinue}
                         disabled={saving}
-                        className="w-full cursor-pointer rounded-full bg-rust text-cream-soft font-serif  text-[0.9rem] sm:text-[1rem] py-3 sm:py-3.5 mt-4 sm:mt-5 shadow-[0_6px_16px_-8px_rgba(97,107,120,0.5)] transition-transform duration-150 hover:brightness-105 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust disabled:opacity-70 disabled:cursor-not-allowed"
+                        className="w-full cursor-pointer rounded-full bg-rust text-cream-soft font-serif  text-[0.9rem] sm:text-[1rem] py-3 sm:py-3.5 mt-4 sm:mt-5 shadow-[0_6px_16px_-8px_rgba(37,49,94,0.5)] transition-transform duration-150 hover:brightness-105 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                         {saving ? "settling in…" : "Open the notebook →"}
                     </button>

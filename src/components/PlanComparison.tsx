@@ -33,6 +33,10 @@ const isPaid = (p: Plan) => p.price.monthly > 0;
 const perMonth = (n: number | null) => (n === null ? null : n === 0 ? false : `${n}/month`);
 const capitalise = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
+const MODELS_ROW = "Claude, GPT & Gemini in general chat";
+const MODEL_PICK_ROW = "Auto mode / choose your model";
+const MODEL_ROWS = [MODELS_ROW, MODEL_PICK_ROW];
+
 const GROUPS: Group[] = [
   {
     title: "Chat",
@@ -66,9 +70,9 @@ const GROUPS: Group[] = [
                 ? "Long-term + pinned"
                 : "Long-term",
       },
-      { label: "Auto mode / choose your model", read: ({ limits }) => (limits.modelSelection ? true : "Auto") },
+      { label: MODEL_PICK_ROW, read: ({ limits }) => (limits.modelSelection ? true : "Auto") },
       {
-        label: "Claude, GPT & Gemini in general chat",
+        label: MODELS_ROW,
         read: ({ limits }) => (limits.modelSelection ? "Credits" : false),
       },
     ],
@@ -138,10 +142,12 @@ const GROUPS: Group[] = [
     title: "Voice",
     rows: [
       {
-        label: "Voice messages in",
+        // One allowance covers both directions: what you say to them and what
+        // they say back. Labelling it "voice messages in" read as input only.
+        label: "Voice minutes (spoken + heard)",
         read: ({ limits }) => (limits.voiceMinutesPerMonth ? `${limits.voiceMinutesPerMonth} min/month` : false),
       },
-      { label: "Spoken replies", read: ({ limits }) => perMonth(limits.spokenRepliesPerMonth) },
+      { label: "Spoken replies (from the same minutes)", read: ({ limits }) => perMonth(limits.spokenRepliesPerMonth) },
       { label: "Premium voices", read: ({ limits }) => (limits.voiceMinutesPerMonth ? "Credits" : false) },
     ],
   },
@@ -228,10 +234,13 @@ export default function PlanComparison({
   plans,
   activePlan,
   trialMessagesPerDay,
+  hideModelRows = false,
 }: {
   plans: Plan[];
   activePlan: PlanId;
   trialMessagesPerDay: number;
+  /** The signed-out landing page mentions no AI models: drop those rows. */
+  hideModelRows?: boolean;
 }) {
   if (plans.length === 0) return null;
 
@@ -274,10 +283,12 @@ export default function PlanComparison({
                   </th>
                 </tr>
 
-                {group.rows.map((row) => (
+                {group.rows.filter((row) => !(hideModelRows && MODEL_ROWS.includes(row.label))).map((row) => (
                   <tr key={row.label} className="border-t border-hairline/40">
                     <th scope="row" className="sticky left-0 z-10 bg-cream-light text-left font-normal px-4 py-2.5">
-                      <span className="font-serif text-[0.85rem] leading-snug text-ink-soft">{row.label}</span>
+                      <span className="font-serif text-[0.85rem] leading-snug text-ink-soft">
+                        {row.label}
+                      </span>
                     </th>
                     {plans.map((p, i) => (
                       <td

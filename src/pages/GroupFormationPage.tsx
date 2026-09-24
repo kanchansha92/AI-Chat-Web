@@ -171,11 +171,11 @@ export default function GroupFormationPage() {
       className="min-h-[100dvh] w-full app-gradient md:flex md:items-center md:justify-center md:px-6 md:py-[6vh]"
       style={{
         background:
-          "radial-gradient(125% 80% at 50% 0%, rgba(97,107,120,0.07) 0%, rgba(97,107,120,0) 55%), var(--color-cream)",
+          "radial-gradient(125% 80% at 50% 0%, rgba(37,49,94,0.07) 0%, rgba(37,49,94,0) 55%), var(--color-cream)",
       }}
     >
       <div className="mx-auto w-full max-w-[560px] md:max-w-[600px] px-5 md:px-0 pt-[max(1rem,env(safe-area-inset-top))] pb-16 md:pt-0 md:pb-0">
-        <div className="md:rounded-[28px] md:border md:border-ink/10 md:bg-cream-light md:px-11 md:py-10 md:shadow-[0_30px_80px_-40px_rgba(22,32,43,0.45)]">
+        <div className="md:rounded-[28px] md:border md:border-ink/10 md:bg-cream-light md:px-11 md:py-10 md:shadow-[0_30px_80px_-40px_rgba(22,34,74,0.45)]">
           <div className="flex items-center gap-3 pb-2">
             <button
               type="button"

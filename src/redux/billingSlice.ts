@@ -43,6 +43,13 @@ export const loadBilling = createAsyncThunk("billing/load", async () => {
   return { billing, credits: { total: credits.total, purchased: credits.purchased, granted: credits.granted }, usage };
 });
 
+/**
+ * Just the meters. After a voice request (or anything else that spends an
+ * allowance) the client re-reads the counts instead of decrementing its own -
+ * the server's number is the only one that decides anything.
+ */
+export const loadUsage = createAsyncThunk("billing/usage", async () => usageService.snapshot());
+
 /** The public catalogue - prices and limits, fetched once. */
 export const loadCatalogue = createAsyncThunk("billing/catalogue", async () => billingService.plans());
 
@@ -109,6 +116,9 @@ const billingSlice = createSlice({
     });
     b.addCase(loadBilling.rejected, (state) => {
       state.status = "error";
+    });
+    b.addCase(loadUsage.fulfilled, (state, action) => {
+      state.usage = action.payload;
     });
     b.addCase(loadCatalogue.fulfilled, (state, action) => {
       state.catalogue = action.payload;

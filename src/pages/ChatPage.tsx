@@ -30,13 +30,20 @@ import { loadBilling, creditsChanged } from "../redux/billingSlice";
 import PremiumToggle from "../components/PremiumToggle";
 import ModelPicker from "../components/ModelPicker";
 import UpgradePrompt, { refusalFrom } from "../components/UpgradePrompt";
+import VoiceRecorderButton from "../components/voice/VoiceRecorderButton";
+import VoicePlayButton from "../components/voice/VoicePlayButton";
+import PremiumVoiceToggle from "../components/voice/PremiumVoiceToggle";
+import { useVoice } from "../hook/useVoice";
+import { usePremiumVoice } from "../lib/voicePrefs";
+import { stopAllPlayback, forgetSpokenReply, useVoicePlayer } from "../hooks/useVoicePlayer";
 import type { Refusal } from "../components/UpgradePrompt";
-import { chatErrorCopy, reportCopy } from "../copy";
+import { chatErrorCopy, reportCopy, voiceCopy } from "../copy";
 import MessageActions, {
   CopyIcon,
   EditIcon,
   RetryIcon,
   ShareIcon,
+  SpeakIcon,
   shareText,
 } from "../components/MessageActions";
 import InlineEditor from "../components/InlineEditor";
@@ -195,13 +202,6 @@ function SendIcon() {
   return (
     <svg viewBox="0 0 24 24" className="h-[1.05rem] w-[1.05rem]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M5 12h13M12 5l7 7-7 7" />
-    </svg>
-  );
-}
-function UpIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-[1.05rem] w-[1.05rem]" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 19V6M6 12l6-6 6 6" />
     </svg>
   );
 }
@@ -713,6 +713,36 @@ export default function ChatPage() {
     toastTimer.current = setTimeout(() => setToast(null), 2400);
   };
 
+  // ─── voice ──────────────────────────────────────────────────────────────────
+  // The hover row has its own speak control (VoicePlayButton). This player is
+  // for the touch action sheet, which has no room for one. Both share the same
+  // audio cache and the same "one clip at a time" rule.
+  const voice = useVoice();
+  const [premiumVoice] = usePremiumVoice();
+  const sheetPlayer = useVoicePlayer({
+    onRefused: (e) => {
+      const refused = refusalFrom(e);
+      if (refused) setRefusal(refused);
+      else showToast(e.message || voiceCopy.ttsFailed);
+      voice.refreshUsage();
+    },
+    onError: showToast,
+  });
+
+  // Leaving this chat (or switching character) ends whatever is speaking.
+  useEffect(() => () => stopAllPlayback(), [characterId]);
+
+  const speakFromSheet = (messageId: string) => {
+    setMenu(null);
+    if (voice.refusal) {
+      setRefusal(voice.refusal);
+      return;
+    }
+    void sheetPlayer
+      .play(messageId, { premium: premiumVoice && voice.premiumAvailable })
+      .then(() => voice.refreshUsage());
+  };
+
   /**
    * c.1 - fetch the page above the one we're holding. The server sends a
    * screenful at a time, so a long thread opens fast and older messages come
@@ -742,7 +772,7 @@ export default function ChatPage() {
   }, [characterId, cursor, loadingOlder]);
 
   const firstInitial = character?.name?.[0]?.toUpperCase() ?? "·";
-  const avatarColour = character?.colour ?? "#616B78";
+  const avatarColour = character?.colour ?? "#25315E";
   const avatarPhoto = character?.avatar ?? null;
 
   const trimmed = input.trim();
@@ -1130,6 +1160,8 @@ export default function ChatPage() {
         modelId,
       });
       setMessages((prev) => prev.map((m) => (m.id === res.reply.id ? res.reply : m)));
+      // the words changed, so anything already spoken for them is stale
+      forgetSpokenReply(res.reply.id);
       if (res.moderation && res.moderation.stage === "output") {
         setStatus("here");
         setPause(res.moderation);
@@ -1152,6 +1184,7 @@ export default function ChatPage() {
       await chatService.deleteFromHere(m.id);
       setMessages((prev) => {
         const idx = prev.findIndex((x) => x.id === m.id);
+        for (const gone of idx >= 0 ? prev.slice(idx) : []) forgetSpokenReply(gone.id);
         return idx >= 0 ? prev.slice(0, idx) : prev;
       });
       showToast("gone.");
@@ -1431,7 +1464,7 @@ export default function ChatPage() {
 
   const header = useMemo(
     () => (
-      <div className="flex items-center gap-3 shrink-0 chat-glass border-b border-hairline/70 px-3 py-2.5 rounded-b-2xl shadow-[0_10px_26px_-24px_rgba(22,32,43,0.7)]">
+      <div className="flex items-center gap-3 shrink-0 chat-glass border-b border-hairline/70 px-3 py-2.5 rounded-b-2xl shadow-[0_10px_26px_-24px_rgba(22,34,74,0.7)]">
         <button
           type="button"
           aria-label="Back"
@@ -1760,7 +1793,7 @@ export default function ChatPage() {
                                         type="button"
                                         onClick={() => setLightbox(m)}
                                         aria-label={m.imageAlt ? `Open image: ${m.imageAlt}` : "Open image"}
-                                        className="group/img relative block w-[min(76vw,340px)] rounded-[20px] rounded-bl-md overflow-hidden border border-hairline/70 bg-cream-dark shadow-[0_14px_30px_-18px_rgba(22,32,43,0.7)] active:scale-[0.99] transition cursor-zoom-in"
+                                        className="group/img relative block w-[min(76vw,340px)] rounded-[20px] rounded-bl-md overflow-hidden border border-hairline/70 bg-cream-dark shadow-[0_14px_30px_-18px_rgba(22,34,74,0.7)] active:scale-[0.99] transition cursor-zoom-in"
                                       >
                                         <img
                                           src={m.imageUrl}
@@ -1811,6 +1844,23 @@ export default function ChatPage() {
                                     actions={[
                                       ...(m.text
                                         ? [{ key: "copy", label: "Copy", icon: CopyIcon, fn: () => void copyText(m) }]
+                                        : []),
+                                      ...(m.text && !isPending(m)
+                                        ? [
+                                          {
+                                            key: "speak",
+                                            label: voiceCopy.speak,
+                                            icon: SpeakIcon,
+                                            fn: () => undefined,
+                                            node: (
+                                              <VoicePlayButton
+                                                messageId={m.id}
+                                                onRefusal={(r) => setRefusal(r)}
+                                                onToast={showToast}
+                                              />
+                                            ),
+                                          },
+                                        ]
                                         : []),
                                       {
                                         key: "retry",
@@ -1951,7 +2001,7 @@ export default function ChatPage() {
                     type="button"
                     aria-label="Scroll to latest message"
                     onClick={() => scrollToBottom()}
-                    className="pointer-events-auto inline-flex items-center gap-1.5 h-9 rounded-full chat-glass border border-hairline/80 shadow-[0_12px_28px_-14px_rgba(22,32,43,0.6)] px-3.5 text-[0.8rem] text-ink-soft hover:text-rust active:scale-95 transition cursor-pointer"
+                    className="pointer-events-auto inline-flex items-center gap-1.5 h-9 rounded-full chat-glass border border-hairline/80 shadow-[0_12px_28px_-14px_rgba(22,34,74,0.6)] px-3.5 text-[0.8rem] text-ink-soft hover:text-rust active:scale-95 transition cursor-pointer"
                   >
                     <DownIcon /> latest
                   </button>
@@ -1963,7 +2013,7 @@ export default function ChatPage() {
             <div className="w-full md:max-w-[900px] md:mx-auto md:px-6 lg:px-10">
               {!loadError && isFreeReached ? (
                 <div className="shrink-0 pt-2 pb-3 chat-pop">
-                  <div className="rounded-3xl border border-[#68775B]/30 bg-[#68775B]/[0.09] px-5 py-4 text-center shadow-[0_16px_36px_-26px_rgba(22,32,43,0.8)]">
+                  <div className="rounded-3xl border border-[#68775B]/30 bg-[#68775B]/[0.09] px-5 py-4 text-center shadow-[0_16px_36px_-26px_rgba(22,34,74,0.8)]">
                     <p className="text-ink text-[0.94rem] leading-relaxed">
                       {/* the count comes from usage, like the countdown beside
                           it hardcoding "30" meant changing the server's limit
@@ -2048,7 +2098,7 @@ export default function ChatPage() {
                       {plusOpen && (
                         <>
                           <div className="fixed inset-0 z-30" onClick={() => setPlusOpen(false)} />
-                          <div className="absolute left-1 bottom-[calc(100%+8px)] z-40 w-56 rounded-2xl border border-hairline bg-cream-light shadow-[0_18px_40px_-20px_rgba(22,32,43,0.5)] p-1.5 chat-pop">
+                          <div className="absolute left-1 bottom-[calc(100%+8px)] z-40 w-56 rounded-2xl border border-hairline bg-cream-light shadow-[0_18px_40px_-20px_rgba(22,34,74,0.5)] p-1.5 chat-pop">
                             <button
                               type="button"
                               onClick={() => {
@@ -2108,14 +2158,18 @@ export default function ChatPage() {
                       >
                         {imagine ? <ImagineIcon /> : <AttachIcon />}
                       </button>
-                      <button
-                        type="button"
-                        aria-label="Voice note"
-                        title="Voice note"
-                        className="h-9 w-9 rounded-full bg-[#68775B] text-white/95 flex items-center justify-center shadow-[0_8px_18px_-10px_rgba(104,119,91,0.9)] hover:brightness-105 active:scale-95 transition cursor-pointer shrink-0"
-                      >
-                        <UpIcon />
-                      </button>
+                      {/* say it instead of typing it - the words land in the
+                          composer, still yours to edit before sending */}
+                      <VoiceRecorderButton
+                        onTranscript={(text) => {
+                          setInput((cur) => (cur ? `${cur.trimEnd()} ${text}` : text));
+                          wakeFromQuiet();
+                          requestAnimationFrame(() => textareaRef.current?.focus());
+                        }}
+                        onRefusal={(r) => setRefusal(r)}
+                        onToast={showToast}
+                        disabled={sending}
+                      />
 
                       {/* the paid extras for this one send. Each hides itself
                           on a plan that does not have it, so the composer stays
@@ -2130,6 +2184,7 @@ export default function ChatPage() {
                         disabled={sending}
                         className="shrink-0 hidden sm:inline-flex"
                       />
+                      <PremiumVoiceToggle className="shrink-0 hidden lg:inline-flex" />
                       <ModelPicker
                         value={modelId}
                         onChange={(id) => {
@@ -2196,7 +2251,7 @@ export default function ChatPage() {
                   aria-modal="true"
                   aria-label={menu.message.sender === "you" ? "Your message" : `Message from ${character?.name ?? "them"}`}
                   tabIndex={-1}
-                  className="relative z-10 w-full max-w-[460px] md:max-w-[420px] mb-3 md:mb-0 mx-3 rounded-3xl chat-sheet border border-hairline/80 overflow-hidden shadow-[0_-10px_40px_-16px_rgba(22,32,43,0.5)] md:shadow-[0_28px_70px_-24px_rgba(22,32,43,0.5)] chat-sheet-up focus:outline-none"
+                  className="relative z-10 w-full max-w-[460px] md:max-w-[420px] mb-3 md:mb-0 mx-3 rounded-3xl chat-sheet border border-hairline/80 overflow-hidden shadow-[0_-10px_40px_-16px_rgba(22,34,74,0.5)] md:shadow-[0_28px_70px_-24px_rgba(22,34,74,0.5)] chat-sheet-up focus:outline-none"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="mx-auto mt-3 mb-1 h-1 w-10 rounded-full bg-ink/10 md:hidden" />
@@ -2221,6 +2276,11 @@ export default function ChatPage() {
                         : []),
                       ...(menu.message.text
                         ? [{ label: "Copy", fn: () => copyText(menu.message) }]
+                        : []),
+                      // touch has no hover row, so the speak control lives here
+                      // too - same message id, same server rules.
+                      ...(menu.message.text && !isPending(menu.message)
+                        ? [{ label: voiceCopy.speakShort, fn: () => speakFromSheet(menu.message.id) }]
                         : []),
                       {
                         label: menu.message.imageUrl ? "Imagine again" : "Regenerate response",
@@ -2264,7 +2324,7 @@ export default function ChatPage() {
                   aria-modal="true"
                   aria-label={pause.headline}
                   tabIndex={-1}
-                  className="relative z-10 w-full max-w-[460px] rounded-t-[28px] md:rounded-[28px] chat-sheet border-t border-x md:border border-hairline/80 px-6 pt-5 pb-8 md:pb-7 text-center shadow-[0_-12px_44px_-16px_rgba(22,32,43,0.55)] md:shadow-[0_30px_80px_-26px_rgba(22,32,43,0.55)] chat-sheet-up focus:outline-none"
+                  className="relative z-10 w-full max-w-[460px] rounded-t-[28px] md:rounded-[28px] chat-sheet border-t border-x md:border border-hairline/80 px-6 pt-5 pb-8 md:pb-7 text-center shadow-[0_-12px_44px_-16px_rgba(22,34,74,0.55)] md:shadow-[0_30px_80px_-26px_rgba(22,34,74,0.55)] chat-sheet-up focus:outline-none"
                 >
                   <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-ink/10 md:hidden" />
                   <div className="mx-auto mb-4 h-12 w-12 rounded-2xl bg-[#b0842f]/15 text-[#b0842f] flex items-center justify-center">
@@ -2312,7 +2372,7 @@ export default function ChatPage() {
                   aria-modal="true"
                   aria-label={reportCopy.headline}
                   tabIndex={-1}
-                  className="relative z-10 w-full max-w-[460px] rounded-t-[28px] md:rounded-[28px] chat-sheet border-t border-x md:border border-hairline/80 px-6 pt-5 pb-8 md:pb-7 shadow-[0_-12px_44px_-16px_rgba(22,32,43,0.55)] md:shadow-[0_30px_80px_-26px_rgba(22,32,43,0.55)] chat-sheet-up focus:outline-none"
+                  className="relative z-10 w-full max-w-[460px] rounded-t-[28px] md:rounded-[28px] chat-sheet border-t border-x md:border border-hairline/80 px-6 pt-5 pb-8 md:pb-7 shadow-[0_-12px_44px_-16px_rgba(22,34,74,0.55)] md:shadow-[0_30px_80px_-26px_rgba(22,34,74,0.55)] chat-sheet-up focus:outline-none"
                 >
                   <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-ink/10" />
                   <h2 className="text-ink text-[1.2rem] font-medium tracking-[-0.01em] leading-tight">
@@ -2329,7 +2389,7 @@ export default function ChatPage() {
                           type="button"
                           onClick={() => setReportReason(r.value)}
                           className={`w-full text-left flex items-center gap-3 rounded-2xl px-4 py-3 border transition cursor-pointer ${checked
-                            ? "border-rust/60 bg-rust/[0.08] shadow-[0_8px_20px_-16px_rgba(22,32,43,0.8)]"
+                            ? "border-rust/60 bg-rust/[0.08] shadow-[0_8px_20px_-16px_rgba(22,34,74,0.8)]"
                             : "border-hairline/70 hover:bg-ink/[0.03] hover:border-hairline"
                             }`}
                         >
@@ -2383,7 +2443,7 @@ export default function ChatPage() {
                   aria-modal="true"
                   aria-label={MEMORY_HEADER.replace("{name}", character?.name ?? "they")}
                   tabIndex={-1}
-                  className="relative z-10 w-full max-w-[460px] md:max-w-[520px] rounded-t-[28px] md:rounded-[28px] chat-sheet border-t border-x md:border border-hairline/80 px-5 pt-5 pb-8 md:pb-6 shadow-[0_-12px_44px_-16px_rgba(22,32,43,0.55)] md:shadow-[0_30px_80px_-26px_rgba(22,32,43,0.55)] max-h-[78%] md:max-h-[80vh] flex flex-col chat-sheet-up focus:outline-none"
+                  className="relative z-10 w-full max-w-[460px] md:max-w-[520px] rounded-t-[28px] md:rounded-[28px] chat-sheet border-t border-x md:border border-hairline/80 px-5 pt-5 pb-8 md:pb-6 shadow-[0_-12px_44px_-16px_rgba(22,34,74,0.55)] md:shadow-[0_30px_80px_-26px_rgba(22,34,74,0.55)] max-h-[78%] md:max-h-[80vh] flex flex-col chat-sheet-up focus:outline-none"
                 >
                   <div className="shrink-0">
                     <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-ink/10" />
@@ -2451,7 +2511,7 @@ export default function ChatPage() {
                   aria-modal="true"
                   aria-label={FORGET_HEADLINE}
                   tabIndex={-1}
-                  className="relative z-10 w-full max-w-[350px] rounded-[26px] chat-sheet border border-hairline/80 p-6 text-center shadow-[0_28px_70px_-24px_rgba(22,32,43,0.6)] chat-dialog-in focus:outline-none"
+                  className="relative z-10 w-full max-w-[350px] rounded-[26px] chat-sheet border border-hairline/80 p-6 text-center shadow-[0_28px_70px_-24px_rgba(22,34,74,0.6)] chat-dialog-in focus:outline-none"
                 >
                   <h3 className="text-ink text-[1.1rem] font-medium tracking-[-0.01em]">{FORGET_HEADLINE}</h3>
                   <p className="text-ink-soft text-[0.88rem] mt-2">{FORGET_BODY}</p>

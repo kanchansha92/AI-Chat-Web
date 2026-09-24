@@ -923,7 +923,7 @@ export default function JournalEntryPage() {
           <div
             role="dialog"
             aria-modal="true"
-            className="w-full max-w-[400px] rounded-3xl border border-ink/10 bg-cream-light p-6 shadow-[0_30px_80px_-40px_rgba(22,32,43,0.6)]"
+            className="w-full max-w-[400px] rounded-3xl border border-ink/10 bg-cream-light p-6 shadow-[0_30px_80px_-40px_rgba(22,34,74,0.6)]"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="font-instrument text-ink text-[1.3rem] leading-tight">

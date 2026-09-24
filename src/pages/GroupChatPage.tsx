@@ -24,6 +24,13 @@ import {
   type Moderation,
 } from "../services/chatService";
 import UpgradePrompt, { refusalFrom } from "../components/UpgradePrompt";
+import VoiceRecorderButton from "../components/voice/VoiceRecorderButton";
+import VoicePlayButton from "../components/voice/VoicePlayButton";
+import PremiumVoiceToggle from "../components/voice/PremiumVoiceToggle";
+import { useVoice } from "../hook/useVoice";
+import { usePremiumVoice } from "../lib/voicePrefs";
+import { stopAllPlayback, forgetSpokenReply, useVoicePlayer } from "../hooks/useVoicePlayer";
+import { voiceCopy } from "../copy";
 import type { Refusal } from "../components/UpgradePrompt";
 import { useAppDispatch } from "../hook/hooks";
 import { loadBilling, creditsChanged } from "../redux/billingSlice";
@@ -250,6 +257,34 @@ export default function GroupChatPage() {
     setToast(msg);
     if (toastTimer.current) clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(null), 2400);
+  };
+
+  // ─── voice ──────────────────────────────────────────────────────────────────
+  // Same rules as 1:1 chat: dictation lands in the composer as text (a room
+  // holds words, not recordings), and a character's line can be read out by id.
+  const voice = useVoice();
+  const [premiumVoice] = usePremiumVoice();
+  const sheetPlayer = useVoicePlayer({
+    onRefused: (e) => {
+      const refused = refusalFrom(e);
+      if (refused) setRefusal(refused);
+      else showToast(e.message || voiceCopy.ttsFailed);
+      voice.refreshUsage();
+    },
+    onError: showToast,
+  });
+
+  useEffect(() => () => stopAllPlayback(), [groupId]);
+
+  const speakFromSheet = (messageId: string) => {
+    setMenu(null);
+    if (voice.refusal) {
+      setRefusal(voice.refusal);
+      return;
+    }
+    void sheetPlayer
+      .play(messageId, { premium: premiumVoice && voice.premiumAvailable })
+      .then(() => voice.refreshUsage());
   };
 
   // On lg+ the rail edits members in place, so this holds whichever seat is open.
@@ -576,6 +611,7 @@ export default function GroupChatPage() {
       await groupService.deleteFromHere(groupId, m.id);
       setMessages((prev) => {
         const idx = prev.findIndex((x) => x.id === m.id);
+        for (const gone of idx >= 0 ? prev.slice(idx) : []) forgetSpokenReply(gone.id);
         return idx >= 0 ? prev.slice(0, idx) : prev;
       });
       showToast("gone.");
@@ -612,6 +648,7 @@ export default function GroupChatPage() {
     try {
       const res = await groupService.regenerate(groupId, m.id, Math.floor(Math.random() * 100000));
       setMessages((prev) => prev.map((x) => (x.id === m.id ? res.reply : x)));
+      forgetSpokenReply(m.id);
       setTyping(false);
       setDrawing(false);
       if (res.moderation && res.moderation.stage === "output") setPause(res.moderation);
@@ -646,7 +683,7 @@ export default function GroupChatPage() {
     (characterId && members.find((m) => m.characterId === characterId)?.avatar) || null;
   const isEmpty = messages.length === 0;
   const statusText = typing ? (drawing ? "sketching" : "writing") : isEmpty ? "scene set" : "in progress";
-  const railTint = members[0]?.colour ?? "#616B78";
+  const railTint = members[0]?.colour ?? "#25315E";
 
   // Hands the loaded group over in route state so details paints before its refetch.
   const openDetails = () => {
@@ -902,7 +939,7 @@ export default function GroupChatPage() {
                                     setMenu({ message: m });
                                   }}
                                   aria-label={m.imageAlt ? `Open image: ${m.imageAlt}` : "Open image"}
-                                  className="group/img relative block w-[min(72vw,320px)] rounded-[18px] rounded-bl-md overflow-hidden border border-ink/10 bg-cream-dark shadow-[0_14px_30px_-18px_rgba(22,32,43,0.7)] active:scale-[0.99] transition cursor-zoom-in"
+                                  className="group/img relative block w-[min(72vw,320px)] rounded-[18px] rounded-bl-md overflow-hidden border border-ink/10 bg-cream-dark shadow-[0_14px_30px_-18px_rgba(22,34,74,0.7)] active:scale-[0.99] transition cursor-zoom-in"
                                 >
                                   <img
                                     src={m.imageUrl}
@@ -920,14 +957,23 @@ export default function GroupChatPage() {
                               </figure>
                             )}
                             {(m.text || (stream && stream.id === m.id)) && (
-                              <button
-                                type="button"
-                                onClick={() => setMenu({ message: m })}
-                                className="text-left max-w-[80%] inline-block rounded-2xl rounded-bl-md bg-cream-dark text-ink font-serif text-[0.92rem] leading-relaxed px-3.5 py-2 border border-ink/[0.06] cursor-pointer active:scale-[0.99] transition-transform"
-                              >
-                                {textFor(m)}
-                                {stream && stream.id === m.id && <span className="text-rust/70">▍</span>}
-                              </button>
+                              <span className="flex items-end gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => setMenu({ message: m })}
+                                  className="text-left max-w-[80%] inline-block rounded-2xl rounded-bl-md bg-cream-dark text-ink font-serif text-[0.92rem] leading-relaxed px-3.5 py-2 border border-ink/[0.06] cursor-pointer active:scale-[0.99] transition-transform"
+                                >
+                                  {textFor(m)}
+                                  {stream && stream.id === m.id && <span className="text-rust/70">▍</span>}
+                                </button>
+                                {m.text && !(stream && stream.id === m.id) && (
+                                  <VoicePlayButton
+                                    messageId={m.id}
+                                    onRefusal={(r) => setRefusal(r)}
+                                    onToast={showToast}
+                                  />
+                                )}
+                              </span>
                             )}
                           </div>
                         </div>
@@ -1066,7 +1112,7 @@ export default function GroupChatPage() {
                         {plusOpen && (
                           <>
                             <div className="fixed inset-0 z-30" onClick={() => setPlusOpen(false)} />
-                            <div className="absolute left-1 bottom-[calc(100%+8px)] z-40 w-56 rounded-2xl border border-ink/10 bg-cream-light shadow-[0_18px_40px_-20px_rgba(22,32,43,0.5)] p-1.5 chat-pop">
+                            <div className="absolute left-1 bottom-[calc(100%+8px)] z-40 w-56 rounded-2xl border border-ink/10 bg-cream-light shadow-[0_18px_40px_-20px_rgba(22,34,74,0.5)] p-1.5 chat-pop">
                               <button
                                 type="button"
                                 onClick={() => {
@@ -1119,6 +1165,17 @@ export default function GroupChatPage() {
                         >
                           {imagine ? <ImagineIcon /> : <AttachIcon />}
                         </button>
+                        <VoiceRecorderButton
+                          size="sm"
+                          onTranscript={(text) => {
+                            setInput((cur) => (cur ? `${cur.trimEnd()} ${text}` : text));
+                            requestAnimationFrame(() => textareaRef.current?.focus());
+                          }}
+                          onRefusal={(r) => setRefusal(r)}
+                          onToast={showToast}
+                          disabled={sending}
+                        />
+                        <PremiumVoiceToggle className="shrink-0 hidden lg:inline-flex" />
                         <textarea
                           ref={textareaRef}
                           rows={1}
@@ -1156,7 +1213,7 @@ export default function GroupChatPage() {
             {menu && (
               <div className="fixed inset-0 z-[60] flex items-end justify-center md:items-center">
                 <div className="absolute inset-0 bg-ink/25 md:bg-ink/40 md:backdrop-blur-sm chat-fade" onClick={() => setMenu(null)} />
-                <div className="relative z-10 w-full max-w-[440px] md:max-w-[360px] md:mx-4 rounded-t-3xl md:rounded-3xl bg-cream-light border-t border-x md:border border-ink/10 px-3 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))] md:pb-3 shadow-[0_-8px_32px_rgba(0,0,0,0.16)] md:shadow-[0_24px_70px_-24px_rgba(22,32,43,0.45)] chat-dialog-in">
+                <div className="relative z-10 w-full max-w-[440px] md:max-w-[360px] md:mx-4 rounded-t-3xl md:rounded-3xl bg-cream-light border-t border-x md:border border-ink/10 px-3 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))] md:pb-3 shadow-[0_-8px_32px_rgba(0,0,0,0.16)] md:shadow-[0_24px_70px_-24px_rgba(22,34,74,0.45)] chat-dialog-in">
                   <div className="mx-auto mt-1 mb-2 h-1 w-10 rounded-full bg-ink/10 md:hidden" />
                   <p className="font-caveat text-muted/80 text-[0.9rem] px-2.5 pb-1">{menu.message.senderName ?? "they"}</p>
                   {[
@@ -1164,6 +1221,7 @@ export default function GroupChatPage() {
                       ? [{ label: "Save image", fn: () => saveImage(menu.message.imageUrl, menu.message.imageAlt) }]
                       : []),
                     ...(menu.message.text ? [{ label: "Copy", fn: () => copyText(menu.message) }] : []),
+                    ...(menu.message.text ? [{ label: voiceCopy.speakShort, fn: () => speakFromSheet(menu.message.id) }] : []),
                     {
                       label: menu.message.imageUrl ? "Imagine again" : "Regenerate",
                       fn: () => regenerate(menu.message),
@@ -1321,7 +1379,7 @@ export default function GroupChatPage() {
             {pause && (
               <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center">
                 <div className="absolute inset-0 bg-ink/25 md:bg-ink/40 md:backdrop-blur-sm" onClick={() => setPause(null)} />
-                <div className="relative z-10 w-full max-w-[440px] md:max-w-[460px] md:mx-4 rounded-t-3xl md:rounded-3xl bg-cream-light border-t border-x md:border border-ink/10 px-6 pt-6 pb-8 md:pb-7 text-center shadow-[0_-8px_32px_rgba(0,0,0,0.16)] md:shadow-[0_24px_70px_-24px_rgba(22,32,43,0.45)]">
+                <div className="relative z-10 w-full max-w-[440px] md:max-w-[460px] md:mx-4 rounded-t-3xl md:rounded-3xl bg-cream-light border-t border-x md:border border-ink/10 px-6 pt-6 pb-8 md:pb-7 text-center shadow-[0_-8px_32px_rgba(0,0,0,0.16)] md:shadow-[0_24px_70px_-24px_rgba(22,34,74,0.45)]">
                   <div className="mx-auto mb-3 h-11 w-11 rounded-full bg-[#b0842f]/15 text-[#b0842f] flex items-center justify-center">
                     <WarnIcon />
                   </div>

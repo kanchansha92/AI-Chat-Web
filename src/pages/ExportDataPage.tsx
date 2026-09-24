@@ -30,7 +30,7 @@ export default function ExportDataPage() {
 
   return (
     <div className="min-h-[100dvh] w-full app-gradient flex items-center justify-center px-5 py-10">
-      <main className="w-full max-w-[420px] rounded-[1.4rem] bg-cream-light border border-hairline/60 shadow-[0_24px_70px_-30px_rgba(22,32,43,0.5)] px-6 py-7 md:px-7 md:py-8 text-center">
+      <main className="w-full max-w-[420px] rounded-[1.4rem] bg-cream-light border border-hairline/60 shadow-[0_24px_70px_-30px_rgba(22,34,74,0.5)] px-6 py-7 md:px-7 md:py-8 text-center">
         <span
           aria-hidden="true"
           className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#68775B]/12 text-[#68775B]"

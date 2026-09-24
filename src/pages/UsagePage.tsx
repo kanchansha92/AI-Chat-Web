@@ -103,6 +103,12 @@ export default function UsagePage() {
                   <UsageMeter key={m.metric} meter={m} />
                 ))}
               </div>
+              {usage.limits.voiceMinutesPerMonth > 0 && (
+                <p className="mt-3 font-caveat text-muted/80 text-[0.82rem]">
+                  voice minutes cover both directions — what you record, and what gets read back to you.
+                  each spoken reply also counts against the spoken-replies line.
+                </p>
+              )}
             </section>
 
             <section className="mt-5 rounded-[1.4rem] border border-hairline/60 bg-cream-light p-5 md:p-7">

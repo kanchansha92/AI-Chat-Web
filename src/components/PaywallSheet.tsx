@@ -14,7 +14,7 @@ export default function PaywallSheet({
   return (
     <div className="fixed inset-0 z-[70] flex items-end justify-center md:items-center md:px-4">
       <div className="absolute inset-0 bg-ink/30" onClick={onClose} />
-      <div className="relative z-10 w-full max-w-[440px] md:max-w-[460px] rounded-t-3xl md:rounded-3xl bg-cream-light border-t border-x md:border border-ink/10 px-6 pt-6 pb-8 md:pb-7 text-center shadow-[0_-8px_32px_rgba(0,0,0,0.16)] md:shadow-[0_24px_70px_-24px_rgba(22,32,43,0.45)]">
+      <div className="relative z-10 w-full max-w-[440px] md:max-w-[460px] rounded-t-3xl md:rounded-3xl bg-cream-light border-t border-x md:border border-ink/10 px-6 pt-6 pb-8 md:pb-7 text-center shadow-[0_-8px_32px_rgba(0,0,0,0.16)] md:shadow-[0_24px_70px_-24px_rgba(22,34,74,0.45)]">
         <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-ink/15 md:hidden" />
         <span
           aria-hidden="true"

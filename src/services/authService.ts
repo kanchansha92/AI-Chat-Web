@@ -183,19 +183,24 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
       emitNetEvent({ type: "signedOut" });
       emitNetEvent({ type: "redirect", to: "/signin" });
     }
-    if (res.status === 429) {
-      emitNetEvent({ type: "toast", message: networkCopy.rateLimited });
-    }
-    if (res.status === 503) {
-      emitNetEvent({ type: "redirect", to: "/maintenance" });
-    }
-
     // data.error is an object, not a string - new Error(data.error) would give
     // you "[object Object]" instead of the message.
     const message: string =
       data?.error?.message ?? "— something didn't look right.";
     const fields: Record<string, string> | undefined = data?.error?.fields;
     const code: string | undefined = data?.error?.code;
+
+    if (res.status === 429) {
+      emitNetEvent({ type: "toast", message: networkCopy.rateLimited });
+    }
+    // A 503 with no code is the server itself being down - that is the
+    // maintenance page. A 503 that carries a code is one FEATURE answering
+    // honestly (VOICE_UNAVAILABLE, PAYMENTS_UNAVAILABLE, MODEL_UNAVAILABLE …);
+    // sending the whole app to /maintenance because voice has no provider
+    // would take the person out of a conversation they were in the middle of.
+    if (res.status === 503 && !code) {
+      emitNetEvent({ type: "redirect", to: "/maintenance" });
+    }
     throw new ApiError(message, res.status, fields, code, data);
   }
 
@@ -258,7 +263,8 @@ export async function requestFile(
     if (res.status === 429) {
       emitNetEvent({ type: "toast", message: networkCopy.rateLimited });
     }
-    if (res.status === 503) {
+    // Same rule as `request`: only an uncoded 503 is "the server is down".
+    if (res.status === 503 && !data?.error?.code) {
       emitNetEvent({ type: "redirect", to: "/maintenance" });
     }
     throw new ApiError(

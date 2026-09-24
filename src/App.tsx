@@ -1,7 +1,7 @@
 
 
 import { useEffect } from "react";
-import { Routes, Route, useParams } from "react-router-dom";
+import { Routes, Route, Navigate, useParams } from "react-router-dom";
 import { Provider } from "react-redux";
 
 import { bootstrap } from "./redux/authSlice";
@@ -35,7 +35,9 @@ import CreditsPage from "./pages/CreditsPage";
 import UsagePage from "./pages/UsagePage";
 import PersonasPage from "./pages/PersonasPage";
 import PublicCharacterPage from "./pages/PublicCharacterPage";
-import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
+import LegalPage from "./pages/LegalPage";
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
 import PastDueBanner from "./components/PastDueBanner";
 import AdminBillingPage from "./pages/admin/BillingPage";
 import PlansPage from "./pages/PlansPage";
@@ -252,13 +254,29 @@ function AppRoutes() {
             </RequireAuth>
           }
         />
+        {/* The legal documents inside the app: same page as /legal, without
+          the public site's navbar and footer. */}
+        <Route
+          path="/settings/legal"
+          element={
+            <RequireAuth>
+              <LegalPage inApp />
+            </RequireAuth>
+          }
+        />
         {/* A shared character card - one of two routes a stranger can open. */}
         <Route path="/c/:slug" element={<PublicCharacterPage />} />
 
         {/* Ungated on purpose, and it has to stay that way. A policy only
           account-holders can read is not published, and both app stores ask
-          for a URL that opens without signing in. */}
-        <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          for a URL that opens without signing in. /privacy and /terms are
+          the old addresses; they open the matching tab of /legal. */}
+        <Route path="/legal" element={<LegalPage />} />
+        <Route path="/privacy" element={<Navigate to="/legal#privacy" replace />} />
+        <Route path="/terms" element={<Navigate to="/legal#terms" replace />} />
+        {/* Ungated for the same reason: the about page is for strangers. */}
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
         <Route
           path="/settings/help"
           element={

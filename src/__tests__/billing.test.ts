@@ -163,7 +163,7 @@ describe("money and meter formatting", () => {
     expect(formatBytes(0)).toBe("0 MB");
   });
 
-  it("reads voice in minutes even though it is metered in seconds", () => {
+  it("reads voice as time used against an allowance in minutes", () => {
     const m = {
       metric: "VOICE_SECONDS" as const,
       used: 120,
@@ -173,7 +173,9 @@ describe("money and meter formatting", () => {
       resetAt: null,
       period: "M:2026-09-01",
     };
-    expect(meterDisplay(m)).toEqual({ used: "2 min", limit: "60 min" });
+    expect(meterDisplay(m)).toEqual({ used: "2:00", limit: "60 min" });
+    // a short first recording still shows as something, not as "0 min"
+    expect(meterDisplay({ ...m, used: 20 }).used).toBe("0:20");
   });
 
   it("says when an allowance comes back", () => {

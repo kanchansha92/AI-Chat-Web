@@ -165,7 +165,7 @@ export default function GroupMemberEditor({
         role="dialog"
         aria-modal="true"
         aria-label={`Edit ${member.name ?? "member"} in this group`}
-        className="relative z-10 w-full max-w-[440px] md:max-w-[520px] md:mx-4 max-h-[92dvh] md:max-h-[86vh] overflow-y-auto no-scrollbar rounded-t-3xl md:rounded-3xl bg-cream-light border-t border-x md:border border-ink/10 px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] md:pb-7 shadow-[0_-8px_32px_rgba(0,0,0,0.16)] md:shadow-[0_24px_70px_-24px_rgba(22,32,43,0.45)]"
+        className="relative z-10 w-full max-w-[440px] md:max-w-[520px] md:mx-4 max-h-[92dvh] md:max-h-[86vh] overflow-y-auto no-scrollbar rounded-t-3xl md:rounded-3xl bg-cream-light border-t border-x md:border border-ink/10 px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] md:pb-7 shadow-[0_-8px_32px_rgba(0,0,0,0.16)] md:shadow-[0_24px_70px_-24px_rgba(22,34,74,0.45)]"
       >
         <div className="md:hidden mx-auto -mt-2 mb-4 h-1 w-10 rounded-full bg-ink/15" />
 
@@ -282,7 +282,7 @@ export default function GroupMemberEditor({
                   aria-pressed={selected}
                   onClick={() => toggleTone(tone)}
                   className={`cursor-pointer rounded-full px-3 py-[3px] font-caveat  text-[0.9rem] leading-normal transition-all duration-150 ${selected
-                    ? "border-[1.5px] border-rust-hover bg-rust font-semibold text-cream-light shadow-[0_2px_7px_rgba(97,107,120,0.35)]"
+                    ? "border-[1.5px] border-rust-hover bg-rust font-semibold text-cream-light shadow-[0_2px_7px_rgba(37,49,94,0.35)]"
                     : "border-[1.5px] border-dashed border-ink/50 bg-transparent text-ink hover:border-solid hover:border-rust/50"
                     }`}
                 >

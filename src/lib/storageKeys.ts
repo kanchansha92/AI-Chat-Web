@@ -20,6 +20,14 @@ export const GENERAL_CHATS_STORAGE_KEY = "ember_general_chats_v1";
 export const PINS_STORAGE_KEY = "ember_sidebar_pins_v1";
 
 /**
+ * "read replies in the premium voice" - a per-device preference, remembered so
+ * it does not have to be set again every session. It only decides what the
+ * client ASKS for; the server still says whether the premium voice exists and
+ * whether the credit can be spent.
+ */
+export const VOICE_PREMIUM_STORAGE_KEY = "ember_voice_premium_v1";
+
+/**
  * Keys holding one person's content. Cleared whenever a session ends, however
  * it ends - an explicit sign-out, or a 401 telling us the session is over.
  * The token is separate because it is cleared through setToken().
@@ -27,6 +35,7 @@ export const PINS_STORAGE_KEY = "ember_sidebar_pins_v1";
 export const SESSION_SCOPED_STORAGE_KEYS = [
   GENERAL_CHATS_STORAGE_KEY,
   PINS_STORAGE_KEY,
+  VOICE_PREMIUM_STORAGE_KEY,
 ] as const;
 
 /** Best-effort: storage throws in private mode and is unavailable in tests. */

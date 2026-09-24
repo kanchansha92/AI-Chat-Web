@@ -60,12 +60,12 @@ export default function JournalNewThreadPage() {
             <span className="h-9 w-9" aria-hidden="true" />
           </div>
 
-          <div className="md:grid md:grid-cols-2 md:rounded-[1.75rem] md:border md:border-hairline/60 md:bg-cream-light md:shadow-[0_24px_60px_-30px_rgba(22,32,43,0.35)] md:overflow-hidden">
+          <div className="md:grid md:grid-cols-2 md:rounded-[1.75rem] md:border md:border-hairline/60 md:bg-cream-light md:shadow-[0_24px_60px_-30px_rgba(22,34,74,0.35)] md:overflow-hidden">
             <div
               className="hidden md:flex md:flex-col md:justify-between p-9 lg:p-11"
               style={{
                 background:
-                  "linear-gradient(155deg, rgba(104,119,91,0.16), rgba(97,107,120,0.10) 60%, rgba(244,239,230,0.4))",
+                  "linear-gradient(155deg, rgba(104,119,91,0.16), rgba(37,49,94,0.10) 60%, rgba(244,239,230,0.4))",
               }}
             >
               <p className="font-caveat  text-rust text-[1rem]">a quiet place</p>
@@ -157,7 +157,7 @@ export default function JournalNewThreadPage() {
                   onClick={start}
                   disabled={!canStart}
                   className={`w-full rounded-full font-serif  text-[1rem] py-3.5 transition active:scale-[0.98] ${canStart
-                    ? "bg-rust text-cream-soft hover:bg-rust-hover cursor-pointer shadow-[0_6px_16px_-4px_rgba(97,107,120,0.5)]"
+                    ? "bg-rust text-cream-soft hover:bg-rust-hover cursor-pointer shadow-[0_6px_16px_-4px_rgba(37,49,94,0.5)]"
                     : "bg-rust/40 text-cream-soft/80 cursor-default"
                     }`}
                 >

@@ -162,7 +162,7 @@ function SignInPage() {
                         <span className="font-display text-sm sm:text-base leading-none -translate-x-px">‹</span>
                     </button>
                     <p className="font-serif  text-ink-soft text-[1rem] sm:text-[1.5rem] lg:text-[1.8rem] tracking-wide">
-                        welcome back
+                        Welcome back
                     </p>
                 </div>
 
@@ -173,7 +173,7 @@ function SignInPage() {
                         <span className=" text-rust">left off</span>.
                     </h1>
                     <p className="font-serif  text-ink-soft text-[0.8rem] sm:text-[0.95rem] lg:text-[1rem] mt-2 mb-5 sm:mb-6">
-                        the notebook is where you left it.
+                        The notebook is where you left it.
                     </p>
 
                     {error && (
@@ -184,7 +184,7 @@ function SignInPage() {
 
                     <form className="flex flex-col gap-3 sm:gap-4" onSubmit={handleSubmit}>
                         <div>
-                            <FieldLabel>email</FieldLabel>
+                            <FieldLabel>Email</FieldLabel>
                             <input
                                 type="email"
                                 placeholder="you@example.com"
@@ -200,7 +200,7 @@ function SignInPage() {
                         </div>
 
                         <div>
-                            <FieldLabel>password</FieldLabel>
+                            <FieldLabel>Password</FieldLabel>
                             <input
                                 type="password"
                                 placeholder="········"
@@ -219,7 +219,7 @@ function SignInPage() {
                                     onClick={() => navigate("/forgot-password")}
                                     className="font-serif  text-ink-soft text-[0.75rem] sm:text-[0.82rem] underline-offset-2 hover:underline hover:text-rust cursor-pointer transition-colors"
                                 >
-                                    forgot your password?
+                                    Forgot your password?
                                 </button>
                             </div>
                         </div>
@@ -227,9 +227,9 @@ function SignInPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full rounded-full bg-rust text-cream-soft cursor-pointer font-display  text-[0.9rem] sm:text-[1.05rem] py-3 sm:py-3.5 mt-2 shadow-[0_6px_16px_-4px_rgba(97,107,120,0.55)] transition-all duration-150 hover:brightness-105 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
+                            className="w-full rounded-full bg-rust text-cream-soft cursor-pointer font-display  text-[0.9rem] sm:text-[1.05rem] py-3 sm:py-3.5 mt-2 shadow-[0_6px_16px_-4px_rgba(37,49,94,0.55)] transition-all duration-150 hover:brightness-105 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
                         >
-                            {loading ? "signing in…" : "Sign in →"}
+                            {loading ? "Signing in…" : "Sign in →"}
                         </button>
 
                         {slow && loading && (
@@ -268,13 +268,13 @@ function SignInPage() {
                 </div>
 
                 <p className="font-serif  text-ink-soft text-[0.75rem] sm:text-[0.85rem] text-center shrink-0 pt-6 pb-2 sm:pb-4">
-                    no account yet?{" "}
+                    No account yet?{" "}
                     <button
                         type="button"
                         onClick={() => navigate("/signup")}
                         className="text-rust  underline-offset-2 hover:underline cursor-pointer"
                     >
-                        create one →
+                        Create one →
                     </button>
                 </p>
             </main>

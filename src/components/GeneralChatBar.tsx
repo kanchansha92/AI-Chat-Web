@@ -9,6 +9,9 @@ import {
   type ReactNode,
 } from "react";
 import { chatService, type AssistantTurn } from "../services/chatService";
+import VoiceRecorderButton from "./voice/VoiceRecorderButton";
+import UpgradePrompt from "./UpgradePrompt";
+import type { Refusal } from "./UpgradePrompt";
 import { ApiError } from "../services/authService";
 import { useAppDispatch, useAppSelector, useAppStore } from "../hook/hooks";
 import {
@@ -55,6 +58,8 @@ export default function GeneralChatBar({ children }: { children?: ReactNode }) {
   );
 
   const [input, setInput] = useState("");
+  // A plan refusal for voice (the bar's other calls handle their own).
+  const [voiceRefusal, setVoiceRefusal] = useState<Refusal | null>(null);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -604,7 +609,7 @@ export default function GeneralChatBar({ children }: { children?: ReactNode }) {
         )}
 
         <div className="relative group">
-          <div className="relative flex items-center gap-2 rounded-full bg-cream-light border border-hairline focus-within:border-rust/40 transition-colors px-3 py-2 shadow-[0_8px_24px_-18px_rgba(22,32,43,0.6)]">
+          <div className="relative flex items-center gap-2 rounded-full bg-cream-light border border-hairline focus-within:border-rust/40 transition-colors px-3 py-2 shadow-[0_8px_24px_-18px_rgba(22,34,74,0.6)]">
             <input
               ref={fileInputRef}
               type="file"
@@ -620,6 +625,16 @@ export default function GeneralChatBar({ children }: { children?: ReactNode }) {
             >
               <AttachIcon />
             </button>
+
+            <VoiceRecorderButton
+              onTranscript={(text) => {
+                setInput((cur) => (cur ? `${cur.trimEnd()} ${text}` : text));
+                requestAnimationFrame(() => textareaRef.current?.focus());
+              }}
+              onRefusal={setVoiceRefusal}
+              onToast={showToast}
+              disabled={sending}
+            />
 
             <textarea
               ref={textareaRef}
@@ -656,6 +671,8 @@ export default function GeneralChatBar({ children }: { children?: ReactNode }) {
           {toast}
         </div>
       )}
+
+      <UpgradePrompt refusal={voiceRefusal} onClose={() => setVoiceRefusal(null)} />
     </div>
   );
 }

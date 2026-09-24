@@ -119,7 +119,7 @@ export default function JournalPage() {
             <button
               type="button"
               onClick={() => navigate("/journal/new")}
-              className="hidden md:inline-flex items-center gap-2 rounded-full bg-rust text-cream-soft font-serif  text-[0.95rem] px-5 py-3 hover:bg-rust-hover active:scale-[0.98] transition cursor-pointer shadow-[0_10px_24px_-10px_rgba(97,107,120,0.6)] shrink-0"
+              className="hidden md:inline-flex items-center gap-2 rounded-full bg-rust text-cream-soft font-serif  text-[0.95rem] px-5 py-3 hover:bg-rust-hover active:scale-[0.98] transition cursor-pointer shadow-[0_10px_24px_-10px_rgba(37,49,94,0.6)] shrink-0"
             >
               <PlusIcon className="h-4 w-4" />
               New thread

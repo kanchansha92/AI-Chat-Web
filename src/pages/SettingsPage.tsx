@@ -333,7 +333,7 @@ export default function SettingsPage() {
         icon={<ShieldIcon />}
         title="Privacy policy"
         subtitle="where your words go"
-        onClick={() => navigate("/privacy")}
+        onClick={() => navigate("/settings/legal#privacy")}
       />
       <Row
         icon={<DownloadIcon />}

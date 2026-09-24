@@ -53,7 +53,9 @@ export const METER_LABELS: Record<UsageMetric, string> = {
   PREMIUM_REPLIES: "premium replies",
   IMAGES: "images",
   HD_IMAGES: "HD images",
-  VOICE_SECONDS: "voice",
+  // One pool, spent from both ends: dictation you speak in, and replies read
+  // out to you. Calling it "voice messages" hid half of what it pays for.
+  VOICE_SECONDS: "voice usage (spoken + heard)",
   SPOKEN_REPLIES: "spoken replies",
   NEW_CHARACTERS: "new characters",
   PERSONA_CHANGES: "persona changes",
@@ -61,11 +63,19 @@ export const METER_LABELS: Record<UsageMetric, string> = {
   DOCUMENT_UPLOADS: "document uploads",
 };
 
-/** Voice is metered in seconds but read in minutes. */
+/**
+ * Voice is metered in seconds and read in time. The allowance is quoted in
+ * minutes (that is how the plan sells it), but what has been used is shown as
+ * m:ss - "0 min" was the answer for anything under half a minute, which reads
+ * as "nothing yet" when it is not.
+ */
 export function meterDisplay(m: Meter): { used: string; limit: string } {
   if (m.metric === "VOICE_SECONDS") {
-    const mins = (n: number) => `${Math.round(n / 60)} min`;
-    return { used: mins(m.used), limit: m.limit === null ? "unlimited" : mins(m.limit) };
+    const clock = (n: number) => `${Math.floor(n / 60)}:${String(Math.max(0, Math.floor(n)) % 60).padStart(2, "0")}`;
+    return {
+      used: clock(m.used),
+      limit: m.limit === null ? "unlimited" : `${Math.round(m.limit / 60)} min`,
+    };
   }
   return { used: String(m.used), limit: m.limit === null ? "unlimited" : String(m.limit) };
 }

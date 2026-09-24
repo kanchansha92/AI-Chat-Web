@@ -47,15 +47,15 @@ function fileBadge(name: string): { label: string; bg: string } {
         case "png":
         case "jpg":
         case "jpeg":
-            return { label: ext.toUpperCase().slice(0, 3), bg: "#16202B" };
+            return { label: ext.toUpperCase().slice(0, 3), bg: "#16224A" };
         case "txt":
             return { label: "TXT", bg: "#8a8a70" };
         case "pdf":
-            return { label: "PDF", bg: "#616B78" };
+            return { label: "PDF", bg: "#25315E" };
         case "zip":
             return { label: "ZIP", bg: "#7d95a3" };
         default:
-            return { label: ext.toUpperCase().slice(0, 3) || "FILE", bg: "#3A4A5A" };
+            return { label: ext.toUpperCase().slice(0, 3) || "FILE", bg: "#5C6375" };
     }
 }
 
@@ -271,7 +271,7 @@ function CharacterBuilderPage() {
                         aria-hidden="true"
                         className="pointer-events-none absolute -right-0.5 -bottom-0.5 grid h-6 w-6
                                    place-items-center rounded-full border border-hairline bg-cream-light
-                                   text-ink-soft shadow-[0_2px_6px_rgba(22,32,43,0.18)]
+                                   text-ink-soft shadow-[0_2px_6px_rgba(22,34,74,0.18)]
                                    transition-colors group-hover:text-rust md:h-[26px] md:w-[26px]"
                     >
                         <svg
@@ -428,7 +428,7 @@ function CharacterBuilderPage() {
                             aria-pressed={selected}
                             onClick={() => toggleTone(tone)}
                             className={`cursor-pointer rounded-full px-3 py-[3px] font-caveat  text-[0.9rem] leading-normal transition-all duration-150 md:px-3.5 md:text-[0.95rem] ${selected
-                                ? "border-[1.5px] border-rust-hover bg-rust font-semibold text-cream-light shadow-[0_2px_7px_rgba(97,107,120,0.35)]"
+                                ? "border-[1.5px] border-rust-hover bg-rust font-semibold text-cream-light shadow-[0_2px_7px_rgba(37,49,94,0.35)]"
                                 : "border-[1.5px] border-dashed border-ink/50 bg-transparent text-ink hover:border-solid hover:border-rust/50"
                                 }`}
                         >
@@ -448,7 +448,7 @@ function CharacterBuilderPage() {
                            md:h-auto md:max-h-full md:max-w-[760px] md:overflow-y-auto md:no-scrollbar
                            md:rounded-[28px] md:border md:border-hairline
                            md:bg-cream-light md:px-10 md:pt-7 md:pb-8
-                           md:shadow-[0_24px_60px_rgba(22,32,43,0.12)]"
+                           md:shadow-[0_24px_60px_rgba(22,34,74,0.12)]"
             >
                 <div className="relative mb-[18px] flex h-9 shrink-0 items-center justify-center md:mb-2 md:h-8 md:justify-end">
                     <button
@@ -506,7 +506,7 @@ function CharacterBuilderPage() {
                                 aria-selected={active}
                                 onClick={() => setMode(m)}
                                 className={`flex-1 cursor-pointer rounded-full py-2 font-display  text-[0.9rem] font-medium transition-all duration-200 md:text-[0.95rem] ${active
-                                    ? "bg-ink text-cream-light shadow-[0_3px_10px_rgba(22,32,43,0.25)]"
+                                    ? "bg-ink text-cream-light shadow-[0_3px_10px_rgba(22,34,74,0.25)]"
                                     : "bg-transparent text-ink-soft hover:text-ink"
                                     }`}
                             >
@@ -686,7 +686,7 @@ function CharacterBuilderPage() {
                         disabled={!!justCreated || submitting}
                         className="mt-3 w-full shrink-0 cursor-pointer rounded-[14px] bg-rust px-8 py-3
                                    font-display  text-[1.05rem] text-cream-light
-                                   shadow-[0_5px_14px_-4px_rgba(97,107,120,0.55),inset_0_-2px_0_rgba(0,0,0,0.1)]
+                                   shadow-[0_5px_14px_-4px_rgba(37,49,94,0.55),inset_0_-2px_0_rgba(0,0,0,0.1)]
                                    transition duration-150 hover:bg-rust-hover active:scale-[0.98]
                                    focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust
                                    disabled:cursor-not-allowed disabled:opacity-70

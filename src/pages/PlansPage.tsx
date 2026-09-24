@@ -112,12 +112,12 @@ export default function PlansPage() {
     // One border rule per state, so the card the user picked is the only one
     // wearing the rust outline.
     const shell = isActive
-      ? `border-rust ring-2 ring-rust/45 shadow-[0_24px_54px_-30px_rgba(60,66,74,0.55)] ${featured ? "bg-gradient-to-b from-cream-light to-cream lg:z-10" : "bg-cream-light"
+      ? `border-rust ring-2 ring-rust/45 shadow-[0_24px_54px_-30px_rgba(37,49,94,0.55)] ${featured ? "bg-gradient-to-b from-cream-light to-cream lg:z-10" : "bg-cream-light"
       }`
       : featured
         ? // Same border as every other card - the featured plan is marked by
         // its badge and backing, never by a rust outline it has not earned.
-        "border-hairline/60 bg-gradient-to-b from-cream-light to-cream shadow-[0_26px_60px_-32px_rgba(60,66,74,0.55)] hover:border-hairline lg:z-10"
+        "border-hairline/60 bg-gradient-to-b from-cream-light to-cream shadow-[0_26px_60px_-32px_rgba(37,49,94,0.55)] hover:border-hairline lg:z-10"
         : "border-hairline/60 bg-cream-light hover:border-hairline hover:shadow-[0_20px_44px_-30px_rgba(0,0,0,0.45)]";
 
     return (

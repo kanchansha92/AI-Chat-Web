@@ -8,6 +8,12 @@ export interface RowAction {
   label: string;
   icon: () => ReactElement;
   fn: () => void;
+  /**
+   * A control that carries state of its own (the speak button is idle,
+   * loading, playing or paused) and so renders itself instead of being a plain
+   * icon + click. When set, `icon`/`fn` are ignored.
+   */
+  node?: ReactElement;
 }
 
 export default function MessageActions({ actions }: { actions: RowAction[] }) {
@@ -15,6 +21,7 @@ export default function MessageActions({ actions }: { actions: RowAction[] }) {
   return (
     <div className="hidden [@media(hover:hover)_and_(pointer:fine)]:flex shrink-0 items-center gap-0.5 self-end pb-1 opacity-0 pointer-events-none transition-opacity duration-150 group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto">
       {actions.map((a) => {
+        if (a.node) return <span key={a.key} className="flex items-center">{a.node}</span>;
         const Icon = a.icon;
         return (
           <button
@@ -95,4 +102,14 @@ export async function shareText(body: string, title: string): Promise<string | n
     if ((e as { name?: string })?.name === "AbortError") return null;
     return "couldn't share that.";
   }
+}
+
+export function SpeakIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-[0.95rem] w-[0.95rem]" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M11 5.5 6.8 9H4.5A1.5 1.5 0 0 0 3 10.5v3A1.5 1.5 0 0 0 4.5 15h2.3L11 18.5z" />
+      <path d="M15.2 9.2a4 4 0 0 1 0 5.6" />
+      <path d="M17.8 6.6a7.6 7.6 0 0 1 0 10.8" />
+    </svg>
+  );
 }

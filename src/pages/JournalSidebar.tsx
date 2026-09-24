@@ -116,8 +116,8 @@ export default function JournalSidebar({ threads: threadsProp }: { threads?: Jou
           type="button"
           onClick={() => navigate("/journal/new")}
           className={`w-full flex items-center gap-2.5 rounded-full px-4 py-2.5 font-serif  text-[0.95rem] transition active:scale-[0.98] cursor-pointer ${onNew
-            ? "bg-rust text-cream-soft shadow-[0_6px_16px_-6px_rgba(97,107,120,0.6)]"
-            : "bg-rust text-cream-soft hover:bg-rust-hover shadow-[0_6px_16px_-8px_rgba(97,107,120,0.55)]"
+            ? "bg-rust text-cream-soft shadow-[0_6px_16px_-6px_rgba(37,49,94,0.6)]"
+            : "bg-rust text-cream-soft hover:bg-rust-hover shadow-[0_6px_16px_-8px_rgba(37,49,94,0.55)]"
             }`}
         >
           <PlusIcon className="h-4 w-4" />

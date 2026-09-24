@@ -151,7 +151,7 @@ export default function GroupsPage() {
       className="min-h-[100dvh] w-full app-gradient md:flex md:justify-center md:px-6 md:py-[6vh]"
       style={{
         background:
-          "radial-gradient(125% 80% at 50% 0%, rgba(97,107,120,0.07) 0%, rgba(97,107,120,0) 55%), var(--color-cream)",
+          "radial-gradient(125% 80% at 50% 0%, rgba(37,49,94,0.07) 0%, rgba(37,49,94,0) 55%), var(--color-cream)",
       }}
     >
       <div className="mx-auto w-full max-w-[560px] md:max-w-[600px] px-5 md:px-0 pt-[max(1rem,env(safe-area-inset-top))] pb-16">
@@ -204,7 +204,7 @@ export default function GroupsPage() {
               return (
                 <div
                   key={g.id}
-                  className="group relative rounded-2xl border border-ink/10 bg-cream-light transition hover:border-rust/40 hover:shadow-[0_16px_40px_-28px_rgba(22,32,43,0.55)] hover:-translate-y-[1px]"
+                  className="group relative rounded-2xl border border-ink/10 bg-cream-light transition hover:border-rust/40 hover:shadow-[0_16px_40px_-28px_rgba(22,34,74,0.55)] hover:-translate-y-[1px]"
                 >
                   {/* Separate button from the trash control - nested buttons are invalid. */}
                   <button
@@ -270,7 +270,7 @@ export default function GroupsPage() {
           onClick={() => !deleting && setPendingDelete(null)}
         >
           <div
-            className="w-full max-w-[400px] rounded-3xl border border-ink/10 bg-cream-light p-6 shadow-[0_30px_80px_-40px_rgba(22,32,43,0.6)]"
+            className="w-full max-w-[400px] rounded-3xl border border-ink/10 bg-cream-light p-6 shadow-[0_30px_80px_-40px_rgba(22,34,74,0.6)]"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="font-display  text-ink text-[1.3rem] leading-tight">

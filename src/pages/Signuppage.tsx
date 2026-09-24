@@ -183,7 +183,7 @@ function SignUpPage() {
                         <span className="font-display text-sm sm:text-base leading-none -translate-x-px">‹</span>
                     </button>
                     <p className="font-serif  text-ink-soft text-[1rem] sm:text-[1.3rem] lg:text-[1.5rem] tracking-wide">
-                        get started
+                        Get started
                     </p>
                 </div>
 
@@ -191,15 +191,15 @@ function SignUpPage() {
                     A notebook of your <span className=" text-rust">own</span>.
                 </h1>
                 <p className="font-serif  text-ink-soft text-[0.8rem] sm:text-[0.95rem] lg:text-[1rem] mt-1.5">
-                    adults only · 18+ · private by default.
+                    Adults only · 18+ · private by default.
                 </p>
                 {/* Before any way of signing up (social included), not under the
                   button. The policy says replies are written by sending the
                   conversation to an AI company - worth knowing before the
                   account exists. */}
                 <p className="font-caveat text-muted text-[0.8rem] sm:text-[0.88rem] mt-1 mb-4">
-                    by signing up you agree to how we handle your words &mdash;{" "}
-                    <Link to="/privacy" className="text-rust hover:text-rust-hover underline underline-offset-2">
+                    By signing up you agree to how we handle your words -
+                    <Link to="/legal#privacy" className="text-rust hover:text-rust-hover underline underline-offset-2">
                         read the privacy policy
                     </Link>
                     .
@@ -242,7 +242,7 @@ function SignUpPage() {
                 {/* 3 · email form */}
                 <form className="flex flex-col gap-3 w-full" onSubmit={handleSubmit}>
                     <div>
-                        <FieldLabel>your name</FieldLabel>
+                        <FieldLabel>Your name</FieldLabel>
                         <input
                             type="text"
                             autoComplete="name"
@@ -259,7 +259,7 @@ function SignUpPage() {
                     </div>
 
                     <div>
-                        <FieldLabel>email</FieldLabel>
+                        <FieldLabel>Email</FieldLabel>
                         <input
                             type="email"
                             autoComplete="email"
@@ -276,7 +276,7 @@ function SignUpPage() {
                     </div>
 
                     <div>
-                        <FieldLabel>password</FieldLabel>
+                        <FieldLabel>Password</FieldLabel>
                         <input
                             type="password"
                             autoComplete="new-password"
@@ -293,7 +293,7 @@ function SignUpPage() {
                     </div>
 
                     <div>
-                        <FieldLabel>date of birth · stays locked</FieldLabel>
+                        <FieldLabel>Date of Birth · stays locked</FieldLabel>
                         <div className="grid grid-cols-[1fr_1fr_1.4fr] gap-2 sm:gap-3">
                             <input
                                 type="text"
@@ -347,7 +347,7 @@ function SignUpPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full rounded-full bg-rust text-cream-soft cursor-pointer font-display  text-[0.9rem] sm:text-[1.05rem] py-3 mt-1 shadow-[0_6px_16px_-4px_rgba(97,107,120,0.55)] transition-all duration-150 hover:brightness-105 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
+                        className="w-full rounded-full bg-rust text-cream-soft cursor-pointer font-display  text-[0.9rem] sm:text-[1.05rem] py-3 mt-1 shadow-[0_6px_16px_-4px_rgba(37,49,94,0.55)] transition-all duration-150 hover:brightness-105 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
                     >
                         {loading ? "opening it…" : "Open my notebook →"}
                     </button>
