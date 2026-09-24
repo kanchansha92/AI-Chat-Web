@@ -14,14 +14,16 @@ type NavItem = { label: string; hash?: string; to?: string };
 const NAV: NavItem[] = [
     { hash: "#features", label: "Features" },
     { hash: "#pricing", label: "Pricing" },
-    { hash: "#faq", label: "FAQ" },
-    { to: "/legal", label: "Legal" },
+    // FAQ and Legal are kept out of the navbar (they're in the footer).
+    // { hash: "#faq", label: "FAQ" },
+    // { to: "/legal", label: "Legal" },
 ];
 
 /** Not in the top bar (the brief keeps it to the product), but in the menu. */
 const MENU_EXTRA: NavItem[] = [
     // { to: "/about", label: "About" },
-    { to: "/contact", label: "Contact" },
+    // Contact is kept out of the navbar (it's in the footer).
+    // { to: "/contact", label: "Contact" },
 ];
 
 function NavLink({
@@ -491,13 +493,10 @@ function FooterLinks({ links, onLanding }: { links: FooterLink[]; onLanding: boo
     );
 }
 
-function FootHead({ children }: { children: ReactNode }) {
-    return <p className="text-ink text-[0.84rem] font-semibold mb-3">{children}</p>;
-}
-
 /* White, like the reference. Who runs Privateaile on the left (the same
    company details as /legal and /contact - change them together), then
-   Product and Legal; the copyright underneath. */
+   the Product and Legal links (no visible headings - the lists are named
+   for screen readers instead); the copyright underneath. */
 export function SiteFooter({ onLanding = false }: { onLanding?: boolean }) {
     return (
         <footer
@@ -523,8 +522,7 @@ export function SiteFooter({ onLanding = false }: { onLanding?: boolean }) {
                     </a>
                 </div>
 
-                <div>
-                    <FootHead>Product</FootHead>
+                <nav aria-label="Product" className="sm:pt-1">
                     <FooterLinks
                         onLanding={onLanding}
                         links={[
@@ -537,10 +535,9 @@ export function SiteFooter({ onLanding = false }: { onLanding?: boolean }) {
                             { to: "/signin", label: "Open the app" },
                         ]}
                     />
-                </div>
+                </nav>
 
-                <div>
-                    <FootHead>Legal</FootHead>
+                <nav aria-label="Legal" className="sm:pt-1">
                     <FooterLinks
                         onLanding={onLanding}
                         links={[
@@ -550,7 +547,7 @@ export function SiteFooter({ onLanding = false }: { onLanding?: boolean }) {
                             { to: "/contact", label: "Contact" },
                         ]}
                     />
-                </div>
+                </nav>
 
                 <div className="col-span-2 sm:col-span-3 border-t border-hairline pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
                     <p className="text-muted text-[0.78rem] leading-[1.6]">
